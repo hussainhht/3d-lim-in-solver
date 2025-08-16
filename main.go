@@ -1,7 +1,8 @@
 package main
 
 import (
-    "fmt"
+	"fmt"
+	lemin "lemin/handels"
 )
 
 // Graph struct with adjacency list
@@ -30,13 +31,13 @@ func (g *Graph) PrintGraph() {
 
 func main() {
     // Create a new graph
-    g := NewGraph()
+    farm := lemin.ReadFile()
+    if farm == nil {
+        fmt.Println("Error reading file")
+        return
+    }
+    fmt.Println(farm.String())
 
-    // Add rooms and connections (edges)
-    g.AddEdge("0", "2")
-    g.AddEdge("2", "3")
-    g.AddEdge("3", "1")
-
-    // Print the graph
-    g.PrintGraph()
+   
+    
 }
