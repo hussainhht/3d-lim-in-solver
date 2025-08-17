@@ -19,7 +19,7 @@ func ReadFile() *Antsfarm {
 	}
 	defer f.Close()
 
-	farm := &Antsfarm{room: make(map[string]*Room)}
+	farm := &Antsfarm{rooms: make(map[string]*Room)}
 	coordSet := make(map[string]string) // key: "x:y" -> room name
 
 	scanner := bufio.NewScanner(f)
@@ -86,8 +86,8 @@ func ReadFile() *Antsfarm {
 		if isLinkLine(line) {
 			linkSection = true
 			name1, name2 := parseLinkLine(line)
-			r1, ok1 := farm.room[name1]
-			r2, ok2 := farm.room[name2]
+			r1, ok1 := farm.rooms[name1]
+			r2, ok2 := farm.rooms[name2]
 			if !ok1 || !ok2 {
 				fmt.Println("Link references unknown room:", line)
 				return nil
@@ -121,7 +121,7 @@ func ReadFile() *Antsfarm {
 			fmt.Println("Invalid room name:", line)
 			return nil
 		}
-		if _, exists := farm.room[name]; exists {
+		if _, exists := farm.rooms[name]; exists {
 			fmt.Println("Duplicate room name:", line)
 			return nil
 		}
@@ -137,7 +137,7 @@ func ReadFile() *Antsfarm {
 			return nil
 		}
 		r := &Room{name: name, x: x, y: y}
-		farm.room[name] = r
+		farm.rooms[name] = r
 		coordSet[coordKey] = name
 		if expectStart {
 			farm.startroom = r
@@ -185,12 +185,12 @@ func (f *Antsfarm) String() string {
 		end = f.endroom.name
 	}
 	linkCount := 0
-	for _, r := range f.room {
+	for _, r := range f.rooms {
 		linkCount += len(r.links)
 	}
 	// each undirected link counted twice
 	linkCount /= 2
-	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.antsnum, len(f.room), linkCount, start, end)
+	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.antsnum, len(f.rooms), linkCount, start, end)
 }
 
 // validateRoomName enforces lem-in constraints on room names.

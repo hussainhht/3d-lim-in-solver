@@ -3,7 +3,7 @@ package lemin
 // Antsfarm represents the parsed lem-in input.
 type Antsfarm struct {
 	antsnum   int
-	room      map[string]*Room
+	rooms     map[string]*Room
 	startroom *Room
 	endroom   *Room
 }
