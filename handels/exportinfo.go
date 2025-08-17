@@ -9,21 +9,6 @@ import (
 	"strings"
 )
 
-// Antsfarm represents the parsed lem-in input.
-type Antsfarm struct {
-	antsnum   int
-	room      map[string]*Room
-	startroom *Room
-	endroom   *Room
-}
-
-// Room represents a single room node.
-type Room struct {
-	name  string
-	links []*Room
-	x, y  int
-}
-
 // readFile parses the lem-in input from text.txt in the current working directory
 // and returns a populated Antsfarm structure.
 func ReadFile() *Antsfarm {
