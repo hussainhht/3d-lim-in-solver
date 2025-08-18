@@ -4,23 +4,26 @@ import (
 	"fmt"
 )
 
-func RunAlgorithm() {
-	// antfarm := ReadFile()
-	// totalAnts := antfarm.antsnum
-	// doneAnts := 0
-	// nextAntOut := 0
-	// paths := findPaths(antfarm)
-	// for doneAnts < totalAnts {
-	// }
-}
+// todo run algo
 
-func findPaths(antFarm *Antsfarm) [][]*Room {
+// func RunAlgorithm() {
+// 	antfarm := ReadFile()
+// 	totalAnts := antfarm.antsnum
+// 	doneAnts := 0
+// 	nextAntOut := 0
+// 	paths := findPaths(antfarm)
+// 	for doneAnts < totalAnts {
+		
+// 	}
+// }
+
+func findPaths(antFarm *Antsfarm) []*Path {
 	startRoom := antFarm.startroom
-	var paths [][]*Room
+	var paths []*Path
 	for _, room := range startRoom.links {
-		path := BFS(room, antFarm.endroom)
-		if path != nil {
-			paths = append(paths, path)
+		path := Path{rooms: BFS(room, antFarm.endroom)}
+		if path.rooms != nil {
+			paths = append(paths, &path)
 		}
 	}
 	paths = sortPaths(paths)
@@ -29,19 +32,19 @@ func findPaths(antFarm *Antsfarm) [][]*Room {
 
 // TODO: Implement pathfinding algorithm
 
-func sortPaths(paths [][]*Room) [][]*Room {
+func sortPaths(paths []*Path) []*Path{
 	if len(paths) <= 1 {
 		return paths
 	}
 	// Merge sort
 	left := sortPaths(paths[:len(paths)/2])
 	right := sortPaths(paths[len(paths)/2:])
-	var result [][]*Room
+	var result []*Path
 	i := 0
 	j := 0
 
 	for i < len(left) && j < len(right) {
-		if len(left[i]) <= len(right[j]) {
+		if len(left[i].rooms) <= len(right[j].rooms) {
 			result = append(result, left[i])
 			i++
 		} else {

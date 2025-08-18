@@ -46,5 +46,5 @@ func main() {
 		return
 	}
 	fmt.Println(farm.String())
-	lemin.RunAlgorithm()
+	// lemin.RunAlgorithm()
 }

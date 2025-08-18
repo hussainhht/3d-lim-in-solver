@@ -10,12 +10,22 @@ type Antsfarm struct {
 
 // Room represents a single room node.
 type Room struct {
-	name  string
-	links []*Room
-	x, y  int
+	name    string
+	links   []*Room
+	x, y    int
 	visited bool
 }
 
 func (r *Room) String() string {
-    return r.name
+	return r.name
+}
+
+type Ant struct {
+	id       int
+	position int
+}
+
+type Path struct {
+	rooms []*Room
+	ants  []*Ant
 }
