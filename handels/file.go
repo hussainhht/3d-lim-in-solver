@@ -36,6 +36,6 @@ func TakeData(f_name string) string {
 		data += scanner.Text() + "\n"
 	}
 
-	return string(data+"\n\n\n\n\n\n\n\n\n\n\n\n")
+	return string(data+"\n")
 }
 
