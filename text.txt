@@ -1,14 +1,15 @@
-
-
-
-4
+6
 ##start
-0 0 3
-#فثقشسغ
-2 2 5
-3 4 0
+start 0 0
+A 1 0
+B 1 1
+C 2 0
+D 2 1
 ##end
-1 8 3
-0-2
-2-3
-3-1
+end 3 0
+start-A
+start-B
+A-C
+B-D
+C-end
+D-end

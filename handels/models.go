@@ -13,4 +13,9 @@ type Room struct {
 	name  string
 	links []*Room
 	x, y  int
+	visited bool
+}
+
+func (r *Room) String() string {
+    return r.name
 }
