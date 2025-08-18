@@ -16,7 +16,7 @@ import (
 // 		for _, path := range paths {
 // 			updatePath(path)
 // 		}
-		
+
 // 		fmt.Println()
 // 	}
 // }
