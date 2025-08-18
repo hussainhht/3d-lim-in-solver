@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"lemin/handels"
+	lemin "lemin/handels"
+	"os"
 )
 
 // Graph struct with adjacency list
@@ -31,9 +32,15 @@ func (g *Graph) PrintGraph() {
 
 func main() {
 	// Create a new graph
-	farm := lemin.ReadFile()
-    lemin.WriteFile(lemin.TakeData())
-    
+	args := os.Args[1:]
+	if len(args) != 1 {
+		fmt.Println("Usage: go run main.go <input_file>")
+		return
+	}
+	FileName := args[0]
+	farm := lemin.ReadFile(FileName)
+	lemin.WriteFile(lemin.TakeData(FileName))
+
 	if farm == nil {
 		fmt.Println("Error reading file")
 		return

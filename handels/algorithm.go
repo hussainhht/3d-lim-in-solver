@@ -27,6 +27,8 @@ func findPaths(antFarm *Antsfarm) [][]*Room {
 	return paths
 }
 
+// TODO: Implement pathfinding algorithm
+
 func sortPaths(paths [][]*Room) [][]*Room {
 	if len(paths) <= 1 {
 		return paths

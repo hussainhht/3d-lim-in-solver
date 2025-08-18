@@ -22,8 +22,8 @@ func WriteFile(
 	}
 }
 
-func TakeData() string {
-	file, err := os.Open("input.txt")
+func TakeData(f_name string) string {
+	file, err := os.Open(f_name)
 	if err != nil {
 		log.Println("Error reading from file:", err)
 		return ""

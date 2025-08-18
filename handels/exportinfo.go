@@ -11,8 +11,9 @@ import (
 
 // readFile parses the lem-in input from text.txt in the current working directory
 // and returns a populated Antsfarm structure.
-func ReadFile() *Antsfarm {
-	f, err := os.Open("input.txt")
+func ReadFile(f_name string) *Antsfarm {
+	//? f_name := "input file name"
+	f, err := os.Open(f_name)
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return nil
