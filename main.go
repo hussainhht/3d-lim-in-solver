@@ -32,6 +32,8 @@ func (g *Graph) PrintGraph() {
 func main() {
 	// Create a new graph
 	farm := lemin.ReadFile()
+    lemin.WriteFile(lemin.TakeData())
+    
 	if farm == nil {
 		fmt.Println("Error reading file")
 		return

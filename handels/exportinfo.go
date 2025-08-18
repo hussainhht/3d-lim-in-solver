@@ -12,7 +12,7 @@ import (
 // readFile parses the lem-in input from text.txt in the current working directory
 // and returns a populated Antsfarm structure.
 func ReadFile() *Antsfarm {
-	f, err := os.Open("text.txt")
+	f, err := os.Open("input.txt")
 	if err != nil {
 		fmt.Println("Error opening file:", err)
 		return nil
