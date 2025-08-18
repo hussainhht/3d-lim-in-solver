@@ -7,8 +7,7 @@ import (
 	"os"
 )
 
-
-//* Write a result to a file
+// * Write a result to a file
 func WriteFile(
 	data string,
 ) {
@@ -25,8 +24,7 @@ func WriteFile(
 	}
 }
 
-
-//* Read result from file and print to stdout
+// * Read result from file and print to stdout
 func TypeResult() {
 	file, err := os.Open("result.txt")
 	if err != nil {
@@ -46,6 +44,7 @@ func TypeResult() {
 	fmt.Print(result)
 }
 
+// * Take data from a input file
 func TakeData(f_name string) string {
 	file, err := os.Open(f_name)
 	if err != nil {

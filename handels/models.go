@@ -23,7 +23,7 @@ func (r *Room) String() string {
 type Ant struct {
 	id       int
 	position int //position in path
-	path *Path
+	path     *Path
 }
 
 func (ant *Ant) Move() {

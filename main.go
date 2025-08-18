@@ -31,12 +31,13 @@ func (g *Graph) PrintGraph() {
 }
 
 func main() {
-	// Create a new graph
+	// * take input file name from command line arguments
 	args := os.Args[1:]
 	if len(args) != 1 {
 		fmt.Println("Usage: go run main.go <input_file>")
 		return
 	}
+
 	FileName := args[0]
 	farm := lemin.ReadFile(FileName)
 	lemin.WriteFile(lemin.TakeData(FileName))
@@ -45,7 +46,9 @@ func main() {
 		fmt.Println("Error reading file")
 		return
 	}
+
+	// ! Print the parsed farm data
 	fmt.Println(farm.String())
 	// lemin.RunAlgorithm()
-	
+
 }
