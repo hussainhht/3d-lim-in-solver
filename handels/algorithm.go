@@ -31,7 +31,7 @@ func sortPaths(paths [][]*Room) [][]*Room {
 	if len(paths) <= 1 {
 		return paths
 	}
-
+	// Merge sort
 	left := sortPaths(paths[:len(paths)/2])
 	right := sortPaths(paths[len(paths)/2:])
 	var result [][]*Room
