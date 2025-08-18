@@ -22,7 +22,12 @@ func (r *Room) String() string {
 
 type Ant struct {
 	id       int
-	position int
+	position int //position in path
+	path *Path
+}
+
+func (ant *Ant) Move() {
+	ant.position++
 }
 
 type Path struct {

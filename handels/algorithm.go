@@ -13,9 +13,31 @@ import (
 // 	nextAntOut := 0
 // 	paths := findPaths(antfarm)
 // 	for doneAnts < totalAnts {
-		
+// 		for _, path := range paths {
+// 			updatePath(path)
+// 		}
+
+// 		fmt.Println()
 // 	}
 // }
+
+func updatePath(path *Path) {
+	for _, ant := range path.ants {
+		if ant.position >= len(ant.path.rooms) {
+			continue
+		}
+		ant.Move()
+		displayMovement(ant.id, ant.path.rooms[ant.position].name)
+	}
+}
+
+func displayMovement(antID int, roomName string) {
+	fmt.Printf("L%v->%v", antID, roomName)
+}
+
+func moveAnt() {
+
+}
 
 func findPaths(antFarm *Antsfarm) []*Path {
 	startRoom := antFarm.startroom
@@ -32,7 +54,7 @@ func findPaths(antFarm *Antsfarm) []*Path {
 
 // TODO: Implement pathfinding algorithm
 
-func sortPaths(paths []*Path) []*Path{
+func sortPaths(paths []*Path) []*Path {
 	if len(paths) <= 1 {
 		return paths
 	}

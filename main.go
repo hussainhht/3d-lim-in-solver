@@ -47,4 +47,5 @@ func main() {
 	}
 	fmt.Println(farm.String())
 	// lemin.RunAlgorithm()
+	
 }
