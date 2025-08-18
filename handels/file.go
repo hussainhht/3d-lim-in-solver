@@ -1,11 +1,14 @@
 package lemin
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
-	"bufio"
 )
 
+
+//* Write a result to a file
 func WriteFile(
 	data string,
 ) {
@@ -22,6 +25,27 @@ func WriteFile(
 	}
 }
 
+
+//* Read result from file and print to stdout
+func TypeResult() {
+	file, err := os.Open("result.txt")
+	if err != nil {
+		log.Println("Error reading from file:", err)
+		os.Exit(1)
+	}
+	defer file.Close()
+	result := ""
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		result += scanner.Text() + "\n"
+	}
+	if err := scanner.Err(); err != nil {
+		log.Println("Error reading from file:", err)
+		os.Exit(1)
+	}
+	fmt.Print(result)
+}
+
 func TakeData(f_name string) string {
 	file, err := os.Open(f_name)
 	if err != nil {
@@ -36,6 +60,5 @@ func TakeData(f_name string) string {
 		data += scanner.Text() + "\n"
 	}
 
-	return string(data+"\n")
+	return string(data + "\n")
 }
-
