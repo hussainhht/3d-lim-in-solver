@@ -21,70 +21,18 @@ import (
 // 	}
 // }
 
-func updatePath(path *Path) {
-	for _, ant := range path.ants {
-		if ant.position >= len(ant.path.rooms) {
-			continue
-		}
-		ant.Move()
-		displayMovement(ant.id, ant.path.rooms[ant.position].name)
-	}
-}
 
 func displayMovement(antID int, roomName string) {
 	fmt.Printf("L%v->%v", antID, roomName)
 }
 
 // TODO : do 
-func moveAnt() {
+func MoveAnt() {
 
 }
 
-func findPaths(antFarm *Antsfarm) []*Path {
-	startRoom := antFarm.startroom
-	var paths []*Path
-	for _, room := range startRoom.links {
-		path := Path{rooms: BFS(room, antFarm.endroom)}
-		if path.rooms != nil {
-			paths = append(paths, &path)
-		}
-	}
-	paths = sortPaths(paths)
-	return paths
-}
 
 // TODO: Implement pathfinding algorithm
-
-func sortPaths(paths []*Path) []*Path {
-	if len(paths) <= 1 {
-		return paths
-	}
-	// Merge sort
-	left := sortPaths(paths[:len(paths)/2])
-	right := sortPaths(paths[len(paths)/2:])
-	var result []*Path
-	i := 0
-	j := 0
-
-	for i < len(left) && j < len(right) {
-		if len(left[i].rooms) <= len(right[j].rooms) {
-			result = append(result, left[i])
-			i++
-		} else {
-			result = append(result, right[j])
-			j++
-		}
-	}
-	for i < len(left) {
-		result = append(result, left[i])
-		i++
-	}
-	for j < len(right) {
-		result = append(result, right[j])
-		j++
-	}
-	return result
-}
 
 func BFS(currentRoom *Room, endRoom *Room) []*Room {
 	visited := make(map[string]bool)
