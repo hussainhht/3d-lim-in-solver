@@ -6,8 +6,9 @@ package lemin
 func FindPaths(antFarm *Antsfarm) []*Path {
 	startRoom := antFarm.startroom
 	var paths []*Path
+	var occupied map[string]bool
 	for _, room := range startRoom.links {
-		path := Path{rooms: BFS(room, antFarm.endroom)}
+		path := Path{rooms: BFS(room, antFarm.endroom, &occupied, antFarm)}
 		if path.rooms != nil {
 			paths = append(paths, &path)
 		}

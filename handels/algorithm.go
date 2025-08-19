@@ -34,7 +34,7 @@ func MoveAnt() {
 
 // TODO: Implement pathfinding algorithm
 
-func BFS(currentRoom *Room, endRoom *Room) []*Room {
+func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *Antsfarm) []*Room {
 	visited := make(map[string]bool)
 	parent := make(map[string]*Room)
 	queue := []*Room{currentRoom}
@@ -48,8 +48,9 @@ func BFS(currentRoom *Room, endRoom *Room) []*Room {
 			break
 		}
 
+
 		for _, neighbor := range node.links {
-			if !visited[neighbor.name] {
+			if !visited[neighbor.name] && !(*occupied)[neighbor.name] {
 				visited[neighbor.name] = true
 				parent[neighbor.name] = node
 				queue = append(queue, neighbor)
@@ -68,6 +69,19 @@ func BFS(currentRoom *Room, endRoom *Room) []*Room {
 		path = append([]*Room{current}, path...)
 		current = parent[current.name]
 	}
+
+	for _, room := range path {
+		if room.name == antFarm.endroom.name {
+			continue
+		}
+
+		(*occupied)[room.name] = true
+	}
+
+	// [] braket
+	// () paranthesis
+	// {} curly braket 
+
 	return path
 }
 
@@ -198,4 +212,8 @@ func RunStressTests() {
 
 }
 //!
+
+
+
+
 
