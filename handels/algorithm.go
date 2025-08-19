@@ -71,6 +71,7 @@ func BFS(currentRoom *Room, endRoom *Room) []*Room {
 	return path
 }
 
+// ! remove this 
 func RunStressTests() {
 	// Create rooms
 	rooms := make(map[string]*Room)
@@ -194,4 +195,7 @@ func RunStressTests() {
 			fmt.Println()
 		}
 	}
+
 }
+//!
+

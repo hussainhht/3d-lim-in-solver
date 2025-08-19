@@ -247,3 +247,4 @@ func addLink(a, b *Room) error {
 	b.links = append(b.links, a)
 	return nil
 }
+
