@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+//!! remove this 
 // Graph struct with adjacency list
 type Graph struct {
 	adj map[string][]string
@@ -29,6 +30,8 @@ func (g *Graph) PrintGraph() {
 		fmt.Printf("%s: %v\n", room, neighbors)
 	}
 }
+
+//!
 
 func main() {
 	// * take input file name from command line arguments

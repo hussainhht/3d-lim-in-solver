@@ -35,6 +35,7 @@ func displayMovement(antID int, roomName string) {
 	fmt.Printf("L%v->%v", antID, roomName)
 }
 
+// TODO : do 
 func moveAnt() {
 
 }
