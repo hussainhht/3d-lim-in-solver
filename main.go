@@ -35,11 +35,17 @@ func (g *Graph) PrintGraph() {
 
 func main() {
 	// * take input file name from command line arguments
+
+	// ! display movement (DisplayMovement handles its own output)
+	lemin.DisplayMovement(1, "A")
+	return
+
 	args := os.Args[1:]
 	if len(args) != 1 {
 		fmt.Println("Usage: go run main.go <input_file>")
 		return
 	}
+	
 
 	FileName := args[0]
 	farm := lemin.ReadFile(FileName)

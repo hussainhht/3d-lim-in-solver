@@ -24,6 +24,6 @@ func UpdatePath(path *Path) {
 			continue
 		}
 		ant.Move()
-		displayMovement(ant.id, ant.path.rooms[ant.position].name)
+		DisplayMovement(ant.id, ant.path.rooms[ant.position].name)
 	}
 }
