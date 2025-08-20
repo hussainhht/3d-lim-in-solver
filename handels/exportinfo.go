@@ -48,7 +48,7 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Invalid ants:", line)
 				return nil
 			}
-			farm.antsnum = ants
+			farm.totalAnts = ants
 			parsedAnts = true
 			continue
 		}
@@ -61,14 +61,14 @@ func ReadFile(f_name string) *Antsfarm {
 			}
 			switch line {
 			case "##start":
-				if farm.startroom != nil {
+				if farm.startRoom != nil {
 					fmt.Println("Duplicate start command:", line)
 					return nil
 				}
 				expectStart = true
 				expectEnd = false
 			case "##end":
-				if farm.endroom != nil {
+				if farm.endRoom != nil {
 					fmt.Println("Duplicate end command:", line)
 					return nil
 				}
@@ -141,10 +141,10 @@ func ReadFile(f_name string) *Antsfarm {
 		farm.rooms[name] = r
 		coordSet[coordKey] = name
 		if expectStart {
-			farm.startroom = r
+			farm.startRoom = r
 			expectStart = false
 		} else if expectEnd {
-			farm.endroom = r
+			farm.endRoom = r
 			expectEnd = false
 		}
 	}
@@ -157,11 +157,11 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("Missing ants line")
 		return nil
 	}
-	if farm.startroom == nil {
+	if farm.startRoom == nil {
 		fmt.Println("Missing start room")
 		return nil
 	}
-	if farm.endroom == nil {
+	if farm.endRoom == nil {
 		fmt.Println("Missing end room")
 		return nil
 	}
@@ -179,11 +179,11 @@ func (f *Antsfarm) String() string {
 	}
 	start := "<nil>"
 	end := "<nil>"
-	if f.startroom != nil {
-		start = f.startroom.name
+	if f.startRoom != nil {
+		start = f.startRoom.name
 	}
-	if f.endroom != nil {
-		end = f.endroom.name
+	if f.endRoom != nil {
+		end = f.endRoom.name
 	}
 	linkCount := 0
 	for _, r := range f.rooms {
@@ -191,7 +191,7 @@ func (f *Antsfarm) String() string {
 	}
 	// each undirected link counted twice
 	linkCount /= 2
-	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.antsnum, len(f.rooms), linkCount, start, end)
+	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.totalAnts, len(f.rooms), linkCount, start, end)
 }
 
 // validateRoomName enforces lem-in constraints on room names.
@@ -247,4 +247,3 @@ func addLink(a, b *Room) error {
 	b.links = append(b.links, a)
 	return nil
 }
-

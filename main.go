@@ -37,8 +37,8 @@ func main() {
 	// * take input file name from command line arguments
 
 	// ! display movement (DisplayMovement handles its own output)
-	lemin.DisplayMovement(1, "A")
-	return
+	// lemin.DisplayMovement(1, "A")
+	// return
 
 	args := os.Args[1:]
 	if len(args) != 1 {
@@ -46,11 +46,10 @@ func main() {
 		return
 	}
 	
-
 	FileName := args[0]
 	farm := lemin.ReadFile(FileName)
 	lemin.WriteFile(lemin.TakeData(FileName))
-
+	lemin.RunAlgorithm(farm)
 	if farm == nil {
 		fmt.Println("Error reading file")
 		return

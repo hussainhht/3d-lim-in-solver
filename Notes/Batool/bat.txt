@@ -1,0 +1,19 @@
+So the project Lem in 
+
+handlers/
+    algorithm
+    exportinfo
+    file
+    findallpath
+    findbistbath
+    models
+    moveant
+    printant
+
+go.mod
+
+main.go
+
+input.txt
+
+result.txt
