@@ -62,7 +62,6 @@ func (ant *Ant) Move(antFarm *Antsfarm) bool {
 	return false
 }
 
-
 type Path struct {
 	rooms []*Room
 	ants  []*Ant

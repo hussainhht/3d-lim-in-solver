@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 	lemin "lemin/handels"
+	"log"
 	"os"
 )
 
-//!! remove this 
+/* !! remove this
 // Graph struct with adjacency list
 type Graph struct {
 	adj map[string][]string
@@ -30,8 +31,7 @@ func (g *Graph) PrintGraph() {
 		fmt.Printf("%s: %v\n", room, neighbors)
 	}
 }
-
-//!
+ ! */
 
 func main() {
 	// * take input file name from command line arguments
@@ -45,18 +45,19 @@ func main() {
 		fmt.Println("Usage: go run main.go <input_file>")
 		return
 	}
-	
+
+	// * Read the input file and parse the data
 	FileName := args[0]
 	farm := lemin.ReadFile(FileName)
-	lemin.WriteFile(lemin.TakeData(FileName))
-	lemin.RunAlgorithm(farm)
 	if farm == nil {
-		fmt.Println("Error reading file")
+		log.Println("Error reading file")
 		return
 	}
 
-	// ! Print the parsed farm data
-	fmt.Println(farm.String())
-	// lemin.RunAlgorithm()
+	//* write the input data to the output file
+	lemin.WriteFile(lemin.TakeData(FileName))
 
+	lemin.RunAlgorithm(farm)
+	
+	
 }

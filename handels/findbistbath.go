@@ -33,3 +33,33 @@ func SortPaths(paths []*Path) []*Path {
 	}
 	return result
 }
+
+
+func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist map[*Path]int) {
+    for _, path := range paths {
+        if dist[path] <= 0 {
+            continue // quota used
+        }
+
+        firstRoom := path.rooms[0]
+        // Only place an ant if room is free (except start)
+        if firstRoom.ant != nil && firstRoom != antFarm.startRoom {
+            continue
+        }
+
+        newAnt := &Ant{
+            id:       antFarm.nextAnt,
+            path:     path,
+            position: 0,
+        }
+        path.ants = append([]*Ant{newAnt}, path.ants...)
+        firstRoom.ant = newAnt
+        antFarm.nextAnt++
+        dist[path]--
+        DisplayMovement(newAnt.id, firstRoom.name)
+
+        if antFarm.nextAnt >= antFarm.totalAnts {
+            break
+        }
+    }
+}

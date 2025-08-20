@@ -2,6 +2,9 @@
 
 package lemin
 
+
+//! this is all not used
+
 func PathCost(pathLen, assigned int) int {
 	// ? (pathLen - 1) + assigned
 	return (pathLen - 1) + assigned
