@@ -2,7 +2,6 @@
 
 package lemin
 
-
 //! this is all not used
 
 func PathCost(pathLen, assigned int) int {
@@ -21,8 +20,8 @@ func AssignGreedy(totalAnts int, paths []*Path) []int {
 	bestPath := 0
 
 	for i := 0; i < totalAnts; i++ {
-		cost := PathCost(len(paths[i].rooms), assigned[i])
-		if cost < PathCost(len(paths[bestPath].rooms), assigned[bestPath]) {
+		cost := PathCost(len(paths[i].Rooms), assigned[i])
+		if cost < PathCost(len(paths[bestPath].Rooms), assigned[bestPath]) {
 			bestPath = i
 		}
 	}

@@ -2,19 +2,19 @@
 package lemin
 
 func FindPaths(antFarm *Antsfarm) []*Path {
-	startRoom := antFarm.startRoom
+	startRoom := antFarm.StartRoom
 	var paths []*Path
 	occupied := make(map[string]bool)
-	occupied[startRoom.name] = true
-	for _, room := range startRoom.links {
-		path := Path{rooms: BFS(room, antFarm.endRoom, &occupied, antFarm)}
-		if path.rooms != nil {
+	occupied[startRoom.Name] = true
+	for _, room := range startRoom.Links {
+		path := Path{Rooms: BFS(room, antFarm.EndRoom, &occupied, antFarm)}
+		if path.Rooms != nil {
 			paths = append(paths, &path)
 		}
 	}
 	paths = SortPaths(paths)
 
-	paths = FilterCheckCompare(paths, antFarm.totalAnts)
+	paths = FilterCheckCompare(paths, antFarm.TotalAnts)
 
 	return paths
 }
@@ -25,12 +25,12 @@ func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
 		return paths
 	}
 
-	shortest := len(paths[0].rooms)
+	shortest := len(paths[0].Rooms)
 	var worthwhile []*Path
 
 	for i, p := range paths {
-	
-		if (len(p.rooms)-shortest) <= (totalAnts/(i+1)) {
+
+		if (len(p.Rooms) - shortest) <= (totalAnts / (i + 1)) {
 			worthwhile = append(worthwhile, p)
 		}
 	}
@@ -38,16 +38,14 @@ func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
 	return worthwhile
 }
 
-
 func UpdatePath(antFarm *Antsfarm, path *Path) {
-	for i := len(path.ants) - 1; i >= 0; i-- {
-		ant := path.ants[i]
+	for i := len(path.Ants) - 1; i >= 0; i-- {
+		ant := path.Ants[i]
 		finished := ant.Move(antFarm)
-		DisplayMovement(ant.id, ant.path.rooms[ant.position].name)
+		DisplayMovement(ant.ID, ant.Path.Rooms[ant.Position].Name)
 		if finished {
 			// safely remove
-			path.ants = append(path.ants[:i], path.ants[i+1:]...)
+			path.Ants = append(path.Ants[:i], path.Ants[i+1:]...)
 		}
 	}
 }
-

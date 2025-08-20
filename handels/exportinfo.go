@@ -20,7 +20,7 @@ func ReadFile(f_name string) *Antsfarm {
 	}
 	defer f.Close()
 
-	farm := &Antsfarm{rooms: make(map[string]*Room)}
+	farm := &Antsfarm{Rooms: make(map[string]*Room)}
 	coordSet := make(map[string]string) // key: "x:y" -> room name
 
 	scanner := bufio.NewScanner(f)
@@ -48,7 +48,7 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Invalid ants:", line)
 				return nil
 			}
-			farm.totalAnts = ants
+			farm.TotalAnts = ants
 			parsedAnts = true
 			continue
 		}
@@ -61,14 +61,14 @@ func ReadFile(f_name string) *Antsfarm {
 			}
 			switch line {
 			case "##start":
-				if farm.startRoom != nil {
+				if farm.StartRoom != nil {
 					fmt.Println("Duplicate start command:", line)
 					return nil
 				}
 				expectStart = true
 				expectEnd = false
 			case "##end":
-				if farm.endRoom != nil {
+				if farm.EndRoom != nil {
 					fmt.Println("Duplicate end command:", line)
 					return nil
 				}
@@ -87,8 +87,8 @@ func ReadFile(f_name string) *Antsfarm {
 		if isLinkLine(line) {
 			linkSection = true
 			name1, name2 := parseLinkLine(line)
-			r1, ok1 := farm.rooms[name1]
-			r2, ok2 := farm.rooms[name2]
+			r1, ok1 := farm.Rooms[name1]
+			r2, ok2 := farm.Rooms[name2]
 			if !ok1 || !ok2 {
 				fmt.Println("Link references unknown room:", line)
 				return nil
@@ -122,7 +122,7 @@ func ReadFile(f_name string) *Antsfarm {
 			fmt.Println("Invalid room name:", line)
 			return nil
 		}
-		if _, exists := farm.rooms[name]; exists {
+		if _, exists := farm.Rooms[name]; exists {
 			fmt.Println("Duplicate room name:", line)
 			return nil
 		}
@@ -137,14 +137,14 @@ func ReadFile(f_name string) *Antsfarm {
 			fmt.Println("Duplicate room coordinates:", line)
 			return nil
 		}
-		r := &Room{name: name, x: x, y: y}
-		farm.rooms[name] = r
+		r := &Room{Name: name, X: x, Y: y}
+		farm.Rooms[name] = r
 		coordSet[coordKey] = name
 		if expectStart {
-			farm.startRoom = r
+			farm.StartRoom = r
 			expectStart = false
 		} else if expectEnd {
-			farm.endRoom = r
+			farm.EndRoom = r
 			expectEnd = false
 		}
 	}
@@ -157,11 +157,11 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("Missing ants line")
 		return nil
 	}
-	if farm.startRoom == nil {
+	if farm.StartRoom == nil {
 		fmt.Println("Missing start room")
 		return nil
 	}
-	if farm.endRoom == nil {
+	if farm.EndRoom == nil {
 		fmt.Println("Missing end room")
 		return nil
 	}
@@ -179,19 +179,19 @@ func (f *Antsfarm) String() string {
 	}
 	start := "<nil>"
 	end := "<nil>"
-	if f.startRoom != nil {
-		start = f.startRoom.name
+	if f.StartRoom != nil {
+		start = f.StartRoom.Name
 	}
-	if f.endRoom != nil {
-		end = f.endRoom.name
+	if f.EndRoom != nil {
+		end = f.EndRoom.Name
 	}
 	linkCount := 0
-	for _, r := range f.rooms {
-		linkCount += len(r.links)
+	for _, r := range f.Rooms {
+		linkCount += len(r.Links)
 	}
 	// each undirected link counted twice
 	linkCount /= 2
-	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.totalAnts, len(f.rooms), linkCount, start, end)
+	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.TotalAnts, len(f.Rooms), linkCount, start, end)
 }
 
 // validateRoomName enforces lem-in constraints on room names.
@@ -238,12 +238,12 @@ func addLink(a, b *Room) error {
 		return errors.New("self-loop is forbidden")
 	}
 	// check duplicates in a's adjacency
-	for _, l := range a.links {
+	for _, l := range a.Links {
 		if l == b {
 			return errors.New("duplicate link")
 		}
 	}
-	a.links = append(a.links, b)
-	b.links = append(b.links, a)
+	a.Links = append(a.Links, b)
+	b.Links = append(b.Links, a)
 	return nil
 }

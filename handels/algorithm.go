@@ -8,44 +8,40 @@ import (
 // todo run algo
 
 func RunAlgorithm(antFarm *Antsfarm) {
-    paths := FindPaths(antFarm)
-    fmt.Println("Found paths:")
-    for _, path := range paths {
-        fmt.Println(path.String())
-    }
+	paths := FindPaths(antFarm)
+	fmt.Println("Found paths:")
+	for _, path := range paths {
+		fmt.Println(path.String())
+	}
 
-    // Precompute ant distribution
-    dist := computeAntDistribution(paths, antFarm.totalAnts)
+	// Precompute ant distribution
+	dist := computeAntDistribution(paths, antFarm.TotalAnts)
 	fmt.Println("Ant distribution:", dist)
-    for antFarm.doneAnts < antFarm.totalAnts {
-        resetVisited(paths)
-        for _, path := range paths { // move ants in paths forward
-            UpdatePath(antFarm, path)
-        }
-        AssignAntsToPath(antFarm, paths, dist)
-        fmt.Println()
-    }
+	for antFarm.DoneAnts < antFarm.TotalAnts {
+		resetVisited(paths)
+		for _, path := range paths { // move ants in paths forward
+			UpdatePath(antFarm, path)
+		}
+		AssignAntsToPath(antFarm, paths, dist)
+		fmt.Println()
+	}
 }
-
 
 func resetVisited(paths []*Path) {
 	for _, path := range paths {
-		for _, room := range path.rooms {
-			room.visited = false
+		for _, room := range path.Rooms {
+			room.Visited = false
 		}
 	}
 }
 
-
-
-//? why this unused
+// ? why this unused
 func isPathAvailable(path *Path) bool {
-	if path.rooms[0].ant != nil || path.rooms[0].visited {
+	if path.Rooms[0].Ant != nil || path.Rooms[0].Visited {
 		return false
 	}
 	return true
 }
-
 
 // TODO: Implement pathfinding algorithm
 
@@ -54,25 +50,25 @@ func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *A
 	parent := make(map[string]*Room)
 	queue := []*Room{currentRoom}
 
-	visited[currentRoom.name] = true
+	visited[currentRoom.Name] = true
 	for len(queue) > 0 {
 		node := queue[0]
 		queue = queue[1:]
 
-		if node.name == endRoom.name {
+		if node.Name == endRoom.Name {
 			break
 		}
 
-		for _, neighbor := range node.links {
-			if !visited[neighbor.name] && !(*occupied)[neighbor.name] {
-				visited[neighbor.name] = true
-				parent[neighbor.name] = node
+		for _, neighbor := range node.Links {
+			if !visited[neighbor.Name] && !(*occupied)[neighbor.Name] {
+				visited[neighbor.Name] = true
+				parent[neighbor.Name] = node
 				queue = append(queue, neighbor)
 			}
 		}
 	}
 
-	if !visited[endRoom.name] {
+	if !visited[endRoom.Name] {
 		return nil
 	}
 
@@ -81,15 +77,15 @@ func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *A
 
 	for current != nil {
 		path = append([]*Room{current}, path...)
-		current = parent[current.name]
+		current = parent[current.Name]
 	}
 
 	for _, room := range path {
-		if room.name == antFarm.endRoom.name {
+		if room.Name == antFarm.EndRoom.Name {
 			continue
 		}
 
-		(*occupied)[room.name] = true
+		(*occupied)[room.Name] = true
 	}
 
 	// [] braket
@@ -99,39 +95,38 @@ func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *A
 	return path
 }
 
-
 func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
-    // Map: path → number of ants assigned
-    dist := make(map[*Path]int)
-    if len(paths) == 0 {
-        return dist
-    }
+	// Map: path → number of ants assigned
+	dist := make(map[*Path]int)
+	if len(paths) == 0 {
+		return dist
+	}
 
-    // Sort paths by length (shortest → longest)
-    sort.Slice(paths, func(i, j int) bool {
-        return len(paths[i].rooms) < len(paths[j].rooms)
-    })
+	// Sort paths by length (shortest → longest)
+	sort.Slice(paths, func(i, j int) bool {
+		return len(paths[i].Rooms) < len(paths[j].Rooms)
+	})
 
-    // Calculate distribution using "turns equalization"
-    remaining := totalAnts
-    for _, path := range paths {
-        dist[path] = 0
-    }
+	// Calculate distribution using "turns equalization"
+	remaining := totalAnts
+	for _, path := range paths {
+		dist[path] = 0
+	}
 
-    for remaining > 0 {
-        // Find path with minimum (length + assigned ants)
-        minTurns := int(^uint(0) >> 1) // Max int
-        var bestPath *Path
-        for _, path := range paths {
-            turns := len(path.rooms) + dist[path]
-            if turns < minTurns {
-                minTurns = turns
-                bestPath = path
-            }
-        }
-        dist[bestPath]++
-        remaining--
-    }
+	for remaining > 0 {
+		// Find path with minimum (length + assigned ants)
+		minTurns := int(^uint(0) >> 1) // Max int
+		var bestPath *Path
+		for _, path := range paths {
+			turns := len(path.Rooms) + dist[path]
+			if turns < minTurns {
+				minTurns = turns
+				bestPath = path
+			}
+		}
+		dist[bestPath]++
+		remaining--
+	}
 
-    return dist
+	return dist
 }
