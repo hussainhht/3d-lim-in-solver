@@ -2,36 +2,81 @@ package lemin
 
 import (
 	"fmt"
+	"sort"
 )
 
 // todo run algo
 
-func RunAlgorithm() {
-	antfarm := ReadFile()
-	totalAnts := antfarm.antsnum
-	doneAnts := 0
-	// nextAntOut := 0
-	paths := FindPaths(antfarm)
-	for doneAnts < totalAnts {
-		for _, path := range paths {
-			updatePath(path)
+func RunAlgorithm(antFarm *Antsfarm) {
+    paths := FindPaths(antFarm)
+    fmt.Println("Found paths:")
+    for _, path := range paths {
+        fmt.Println(path.String())
+    }
+
+    // Precompute ant distribution
+    dist := computeAntDistribution(paths, antFarm.totalAnts)
+	fmt.Println("Ant distribution:", dist)
+    for antFarm.doneAnts < antFarm.totalAnts {
+        resetVisited(paths)
+        for _, path := range paths { // move ants in paths forward
+            UpdatePath(antFarm, path)
+        }
+        assignAntsToPath(antFarm, paths, dist)
+        fmt.Println()
+    }
+}
+
+
+func resetVisited(paths []*Path) {
+	for _, path := range paths {
+		for _, room := range path.rooms {
+			room.visited = false
 		}
-		fmt.Println()
 	}
 }
 
-func updatePath(path *Path) {
-	for _, ant := range path.ants {
-		if ant.position >= len(ant.path.rooms) {
-			continue
-		}
-		ant.Move()
-		DisplayMovement(ant.id, ant.path.rooms[ant.position].name)
+func assignAntsToPath(antFarm *Antsfarm, paths []*Path, dist map[*Path]int) {
+    for _, path := range paths {
+        if dist[path] <= 0 {
+            continue // quota used
+        }
+
+        firstRoom := path.rooms[0]
+        // Only place an ant if room is free (except start)
+        if firstRoom.ant != nil && firstRoom != antFarm.startRoom {
+            continue
+        }
+
+        newAnt := &Ant{
+            id:       antFarm.nextAnt,
+            path:     path,
+            position: 0,
+        }
+        path.ants = append([]*Ant{newAnt}, path.ants...)
+        firstRoom.ant = newAnt
+        antFarm.nextAnt++
+        dist[path]--
+        DisplayMovement(newAnt.id, firstRoom.name)
+
+        if antFarm.nextAnt >= antFarm.totalAnts {
+            break
+        }
+    }
+}
+
+
+
+
+func isPathAvailable(path *Path) bool {
+	if path.rooms[0].ant != nil || path.rooms[0].visited {
+		return false
 	}
+	return true
 }
 
 func DisplayMovement(antID int, roomName string) {
-	fmt.Printf("L%v->%v", antID, roomName)
+	fmt.Printf("L%v->%v ", antID, roomName)
 }
 
 // TODO : do
@@ -77,7 +122,7 @@ func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *A
 	}
 
 	for _, room := range path {
-		if room.name == antFarm.endroom.name {
+		if room.name == antFarm.endRoom.name {
 			continue
 		}
 
@@ -89,4 +134,41 @@ func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *A
 	// {} curly braket
 
 	return path
+}
+
+
+func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
+    // Map: path → number of ants assigned
+    dist := make(map[*Path]int)
+    if len(paths) == 0 {
+        return dist
+    }
+
+    // Sort paths by length (shortest → longest)
+    sort.Slice(paths, func(i, j int) bool {
+        return len(paths[i].rooms) < len(paths[j].rooms)
+    })
+
+    // Calculate distribution using "turns equalization"
+    remaining := totalAnts
+    for _, path := range paths {
+        dist[path] = 0
+    }
+
+    for remaining > 0 {
+        // Find path with minimum (length + assigned ants)
+        minTurns := int(^uint(0) >> 1) // Max int
+        var bestPath *Path
+        for _, path := range paths {
+            turns := len(path.rooms) + dist[path]
+            if turns < minTurns {
+                minTurns = turns
+                bestPath = path
+            }
+        }
+        dist[bestPath]++
+        remaining--
+    }
+
+    return dist
 }

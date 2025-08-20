@@ -3,8 +3,6 @@
 
 package lemin
 
-
-
 func SortPaths(paths []*Path) []*Path {
 	if len(paths) <= 1 {
 		return paths
