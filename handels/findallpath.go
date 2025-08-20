@@ -5,6 +5,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 	startRoom := antFarm.startRoom
 	var paths []*Path
 	occupied := make(map[string]bool)
+	occupied[startRoom.name] = true
 	for _, room := range startRoom.links {
 		path := Path{rooms: BFS(room, antFarm.endRoom, &occupied, antFarm)}
 		if path.rooms != nil {
@@ -49,3 +50,4 @@ func UpdatePath(antFarm *Antsfarm, path *Path) {
 		}
 	}
 }
+
