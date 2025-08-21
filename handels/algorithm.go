@@ -46,54 +46,46 @@ func resetVisited(paths []*Path) {
 
 // TODO: Implement pathfinding algorithm
 
-func BFS(currentRoom *Room, endRoom *Room, occupied *map[string]bool, antFarm *Antsfarm) []*Room {
-	visited := make(map[string]bool)
-	parent := make(map[string]*Room)
-	queue := []*Room{currentRoom}
+func BFS(antFarm *Antsfarm) []*Path {
+	var results []*Path
 
-	visited[currentRoom.Name] = true
+	// Queue of paths; each path is a slice of Room pointers
+	queue := [][]*Room{{antFarm.StartRoom}}
+
 	for len(queue) > 0 {
-		node := queue[0]
+		// Dequeue first path
+		path := queue[0]
 		queue = queue[1:]
 
-		if node.Name == endRoom.Name {
-			break
+		lastRoom := path[len(path)-1]
+
+		if lastRoom == antFarm.EndRoom  {
+			// Found a complete path
+			results = append(results, &Path{Rooms: path[1:]})
+			continue
 		}
 
-		for _, neighbor := range node.Links {
-			if !visited[neighbor.Name] && !(*occupied)[neighbor.Name] {
-				visited[neighbor.Name] = true
-				parent[neighbor.Name] = node
-				queue = append(queue, neighbor)
+		// Explore neighbors
+		for _, neighbor := range lastRoom.Links {
+			if !roomInPath(path, neighbor) {
+				newPath := append([]*Room{}, path...) // copy current path
+				newPath = append(newPath, neighbor)
+				queue = append(queue, newPath)
 			}
 		}
 	}
 
-	if !visited[endRoom.Name] {
-		return nil
-	}
+	return results
+}
 
-	path := []*Room{}
-	current := endRoom
-
-	for current != nil {
-		path = append([]*Room{current}, path...)
-		current = parent[current.Name]
-	}
-
-	for _, room := range path {
-		if room.Name == antFarm.EndRoom.Name {
-			continue
+// Helper: check if a room is already in the path (to avoid cycles)
+func roomInPath(path []*Room, room *Room) bool {
+	for _, r := range path {
+		if r == room {
+			return true
 		}
-
-		(*occupied)[room.Name] = true
 	}
-
-	// [] braket
-	// () paranthesis
-	// {} curly braket
-
-	return path
+	return false
 }
 
 func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
