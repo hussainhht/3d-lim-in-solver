@@ -37,12 +37,12 @@ func resetVisited(paths []*Path) {
 }
 
 // ? why this unused
-func isPathAvailable(path *Path) bool {
-	if path.Rooms[0].Ant != nil || path.Rooms[0].Visited {
-		return false
-	}
-	return true
-}
+// func isPathAvailable(path *Path) bool {
+// 	if path.Rooms[0].Ant != nil || path.Rooms[0].Visited {
+// 		return false
+// 	}
+// 	return true
+// }
 
 // TODO: Implement pathfinding algorithm
 
