@@ -32,39 +32,38 @@ type Ant struct {
 }
 
 func (ant *Ant) Move(antFarm *Antsfarm) bool {
-	nextPosition := ant.Position + 1
-	if nextPosition >= len(ant.Path.Rooms) {
-		// Already at end
-		return true
-	}
+    nextPosition := ant.Position + 1
+    if nextPosition >= len(ant.Path.Rooms) {
+        return true
+    }
 
-	currentRoom := ant.Path.Rooms[ant.Position]
-	nextRoom := ant.Path.Rooms[nextPosition]
+    currentRoom := ant.Path.Rooms[ant.Position]
+    nextRoom := ant.Path.Rooms[nextPosition]
 
-	// If next room is occupied, wait
-	if nextRoom.Ant != nil {
-		fmt.Print("L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
-		return false
-	}
+    // Only block if next room is occupied AND it is not the end room
+    if nextRoom != antFarm.EndRoom && nextRoom.Ant != nil {
+        fmt.Print("L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
+        return false
+    }
 
-	// Move ant
-	currentRoom.Ant = nil
-	ant.Position++
-	nextRoom.Ant = ant
+    // Move ant
+    currentRoom.Ant = nil
+    ant.Position++
+    if nextRoom != antFarm.EndRoom {
+        nextRoom.Ant = ant
+    } else {
+        // Arrived at end
+        antFarm.DoneAnts++
+    }
 
-	// Reached end?
-	if nextRoom == antFarm.EndRoom {
-		antFarm.DoneAnts++
-		nextRoom.Ant = nil // free end room
-		return true        // signal that this ant is finished
-	}
-
-	return false
+    return nextRoom == antFarm.EndRoom
 }
+
 
 type Path struct {
 	Rooms []*Room
 	Ants  []*Ant
+	Antscount int
 }
 
 func (p *Path) String() string {

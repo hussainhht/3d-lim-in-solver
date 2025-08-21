@@ -2,6 +2,8 @@ package lemin
 
 import (
 	"fmt"
+	"os"
+	"sort"
 )
 
 // todo run algo
@@ -14,15 +16,33 @@ func RunAlgorithm(antFarm *Antsfarm) {
 	for _, path := range paths {
 		fmt.Println(path.String())
 	}
-
+	//print paths to file
+	file, err := os.Create("paths.txt")
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
+	for _, path := range paths {
+		// write path to file
+		_, err := file.WriteString(path.String() + "\n")
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
+	}
 	// Precompute ant distribution
 	dist := computeAntDistribution(paths, antFarm.TotalAnts)
 	fmt.Println("Ant distribution:", dist)
+	os.WriteFile("dist.txt", []byte(fmt.Sprintf("%v", dist)), 0644)
+	// fmt.Println("Ant distribution:", dist)
 	for antFarm.DoneAnts < antFarm.TotalAnts {
 		resetVisited(paths)
 		for _, path := range paths { // move ants in paths forward
-			UpdatePath(antFarm, path)
+			// fmt.Println("1")
+			UpdatePath(antFarm, path, dist)
 		}
+		// fmt.Println(dist)
 		AssignAntsToPath(antFarm, paths, dist)
 		fmt.Println()
 	}
@@ -45,12 +65,17 @@ func resetVisited(paths []*Path) {
 // }
 
 // TODO: Implement pathfinding algorithm
-
 func BFS(antFarm *Antsfarm) []*Path {
 	var results []*Path
+	start := antFarm.StartRoom
 
 	// Queue of paths; each path is a slice of Room pointers
-	queue := [][]*Room{{antFarm.StartRoom}}
+	queue := [][]*Room{}
+
+	// Initialize queue with start room's neighbors
+	for _, link := range start.Links {
+		queue = append(queue, []*Room{link})
+	}
 
 	for len(queue) > 0 {
 		// Dequeue first path
@@ -59,15 +84,16 @@ func BFS(antFarm *Antsfarm) []*Path {
 
 		lastRoom := path[len(path)-1]
 
-		if lastRoom == antFarm.EndRoom  {
-			// Found a complete path
-			results = append(results, &Path{Rooms: path[1:]})
+		if lastRoom == antFarm.EndRoom {
+			// Found a complete path, store without start room
+			results = append(results, &Path{Rooms: path})
 			continue
 		}
 
 		// Explore neighbors
 		for _, neighbor := range lastRoom.Links {
-			if !roomInPath(path, neighbor) {
+			// Skip rooms already in path OR start room
+			if !roomInPath(path, neighbor) && neighbor != start {
 				newPath := append([]*Room{}, path...) // copy current path
 				newPath = append(newPath, neighbor)
 				queue = append(queue, newPath)
@@ -77,6 +103,8 @@ func BFS(antFarm *Antsfarm) []*Path {
 
 	return results
 }
+
+
 
 // Helper: check if a room is already in the path (to avoid cycles)
 func roomInPath(path []*Room, room *Room) bool {
@@ -88,24 +116,24 @@ func roomInPath(path []*Room, room *Room) bool {
 	return false
 }
 
-func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
+func computeAntDistribution(paths []*Path, totalAnts int) *map[string]int {
 	// Map: path → number of ants assigned
-	dist := make(map[*Path]int)
+	dist := make(map[string]int)
 	if len(paths) == 0 {
-		return dist
+		return &dist
 	}
 
 	//! not important
-	// sort.Slice(paths,
-	// 	func(i, j int) bool {
-	// 		return len(paths[i].Rooms) < len(paths[j].Rooms)
-	// 	},
-	// )
+	sort.Slice(paths,
+		func(i, j int) bool {
+			return len(paths[i].Rooms) < len(paths[j].Rooms)
+		},
+	)
 
 	// Calculate distribution using "turns equalization"
 	remaining := totalAnts
 	for _, path := range paths {
-		dist[path] = 0
+		dist[path.String()] = 0
 	}
 
 	for remaining > 0 {
@@ -113,15 +141,15 @@ func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
 		minTurns := int(^uint(0) >> 1) // Max int
 		var bestPath *Path
 		for _, path := range paths {
-			turns := len(path.Rooms) + dist[path]
+			turns := len(path.Rooms) + dist[path.String()]
 			if turns < minTurns {
 				minTurns = turns
 				bestPath = path
 			}
 		}
-		dist[bestPath]++
+		dist[bestPath.String()]++
 		remaining--
 	}
 
-	return dist
+	return &dist
 }

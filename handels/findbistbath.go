@@ -3,6 +3,8 @@
 
 package lemin
 
+// import "fmt"
+
 // ? bader func  merge  sort
 // ? func SortPaths(paths []*Path) []*Path {
 // 	if len(paths) <= 1 {
@@ -35,30 +37,39 @@ package lemin
 // 	return result
 // }
 
-
-
-func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist map[*Path]int) {
+func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist *map[string]int) {
 	for _, path := range paths {
-		if dist[path] <= 0 {
-			continue // quota used
-		}
+		// fmt.Println(dist)
 
-		firstRoom := path.Rooms[0]
-		// Only place an ant if room is free (except start)
-		if firstRoom.Ant != nil && firstRoom != antFarm.StartRoom {
+		if (*dist)[path.String()] <= 0 {
 			continue
 		}
+		// fmt.Println("1")
 
+		if len(path.Rooms) == 1 {
+			// fmt.Println("1")
+
+			newAnt := &Ant{
+				ID:       antFarm.NextAnt + 1,
+				Path:     path,
+				Position: 0, // start room
+			}
+			antFarm.NextAnt++
+			(*dist)[path.String()]--
+			antFarm.DoneAnts++
+			DisplayMovement(newAnt.ID, antFarm.EndRoom.Name)
+			continue
+		}
+		// Only assign ant in start room (Position = 0)
 		newAnt := &Ant{
-			ID:       antFarm.NextAnt,
+			ID:       antFarm.NextAnt + 1,
 			Path:     path,
-			Position: 0,
+			Position: 0, // start room
 		}
 		path.Ants = append([]*Ant{newAnt}, path.Ants...)
-		firstRoom.Ant = newAnt
 		antFarm.NextAnt++
-		dist[path]--
-		DisplayMovement(newAnt.ID, firstRoom.Name)
+		(*dist)[path.String()]--
+		DisplayMovement(newAnt.ID, path.Rooms[0].Name)
 
 		if antFarm.NextAnt >= antFarm.TotalAnts {
 			break
