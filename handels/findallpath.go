@@ -32,25 +32,25 @@ func findBestPaths(paths *[]*Path) {
 
 	// Build overlap map: overlaps[i][j] = true if path i and j share rooms
 	overlaps := make(map[int]map[int]bool)
-	for i := 0; i < n; i++ {
-		overlaps[i] = make(map[int]bool)
-		for j := 0; j < n; j++ {
-			if i != j && pathsOverlap((*paths)[i], (*paths)[j]) {
-				overlaps[i][j] = true
-			}
-		}
-	}
+	for i := range *paths {
+        overlaps[i] = make(map[int]bool)
+        for j := range *paths {
+            if i != j && pathsOverlap((*paths)[i], (*paths)[j]) {
+                overlaps[i][j] = true
+            }
+        }
+    }    
 
 	// Find best combination using backtracking
 	bestCombo := findBestCombination(overlaps, n)
 
 	// Collect the paths that are in the best combination
-	var bestPaths []*Path
-	for i := 0; i < n; i++ {
-		if bestCombo[i] {
-			bestPaths = append(bestPaths, (*paths)[i])
-		}
-	}
+    var bestPaths []*Path
+    for i := range *paths {
+        if bestCombo[i] {
+            bestPaths = append(bestPaths, (*paths)[i])
+        }
+    }    
 
 	// Update the original slice
 	*paths = bestPaths
