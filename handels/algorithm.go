@@ -2,7 +2,6 @@ package lemin
 
 import (
 	"fmt"
-	"sort"
 )
 
 // todo run algo
@@ -10,6 +9,8 @@ import (
 func RunAlgorithm(antFarm *Antsfarm) {
 	paths := FindPaths(antFarm)
 	fmt.Println("Found paths:")
+
+	//! this is not the final printing this is only for debugging
 	for _, path := range paths {
 		fmt.Println(path.String())
 	}
@@ -102,10 +103,12 @@ func computeAntDistribution(paths []*Path, totalAnts int) map[*Path]int {
 		return dist
 	}
 
-	// Sort paths by length (shortest → longest)
-	sort.Slice(paths, func(i, j int) bool {
-		return len(paths[i].Rooms) < len(paths[j].Rooms)
-	})
+	//! not important
+	// sort.Slice(paths,
+	// 	func(i, j int) bool {
+	// 		return len(paths[i].Rooms) < len(paths[j].Rooms)
+	// 	},
+	// )
 
 	// Calculate distribution using "turns equalization"
 	remaining := totalAnts

@@ -1,6 +1,8 @@
 // TODO: find  all path we can take from start to end
 package lemin
 
+import "sort"
+
 func FindPaths(antFarm *Antsfarm) []*Path {
 	startRoom := antFarm.StartRoom
 	var paths []*Path
@@ -12,7 +14,14 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 			paths = append(paths, &path)
 		}
 	}
-	paths = SortPaths(paths)
+	
+	// * Sort paths by length (shortest → longest)
+	// the first input is the path being sorted, the second input is the function
+	// the function works like this [1 2] 3 checks the condition if it's true it swaps them
+	// then 1 [2 3]
+	sort.Slice(paths, func(i, j int) bool {
+		return len(paths[i].Rooms) > len(paths[j].Rooms)
+	})
 
 	paths = FilterCheckCompare(paths, antFarm.TotalAnts)
 

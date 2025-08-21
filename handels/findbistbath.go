@@ -3,36 +3,39 @@
 
 package lemin
 
-func SortPaths(paths []*Path) []*Path {
-	if len(paths) <= 1 {
-		return paths
-	}
-	// Merge sort
-	left := SortPaths(paths[:len(paths)/2])
-	right := SortPaths(paths[len(paths)/2:])
-	var result []*Path
-	i := 0
-	j := 0
+// ? bader func  merge  sort
+// ? func SortPaths(paths []*Path) []*Path {
+// 	if len(paths) <= 1 {
+// 		return paths
+// 	}
+// 	// Merge sort
+// 	left := SortPaths(paths[:len(paths)/2])
+// 	right := SortPaths(paths[len(paths)/2:])
+// 	var result []*Path
+// 	i := 0
+// 	j := 0
+// //
+// 	for i < len(left) && j < len(right) {
+// 		if len(left[i].Rooms) <= len(right[j].Rooms) {
+// 			result = append(result, left[i])
+// 			i++
+// 		} else {
+// 			result = append(result, right[j])
+// 			j++
+// 		}
+// 	}
+// 	for i < len(left) {
+// 		result = append(result, left[i])
+// 		i++
+// 	}
+// 	for j < len(right) {
+// 		result = append(result, right[j])
+// 		j++
+// 	}
+// 	return result
+// }
 
-	for i < len(left) && j < len(right) {
-		if len(left[i].Rooms) <= len(right[j].Rooms) {
-			result = append(result, left[i])
-			i++
-		} else {
-			result = append(result, right[j])
-			j++
-		}
-	}
-	for i < len(left) {
-		result = append(result, left[i])
-		i++
-	}
-	for j < len(right) {
-		result = append(result, right[j])
-		j++
-	}
-	return result
-}
+
 
 func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist map[*Path]int) {
 	for _, path := range paths {
