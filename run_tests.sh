@@ -1,25 +1,26 @@
 #!/bin/bash
 
-# Colors for output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+export PATH=$PATH:/usr/local/go/bin  # adjust if needed
 
-echo "🧪 Running all test cases from test/ directory..."
+for i in {00..05}; do
+    testfile="test/example$i.txt"
+    resultfile="result/result$i.txt"
 
-for file in test/*.txt; do
-    echo -e "\n=============================="
-    echo -e "▶️  Running: $file"
-    output=$(go run . "$file" 2>&1)
+    echo -e "\n============================================================================="
+    echo -e "▶️  Running: example$i.txt"
 
-    # Check for error message
-    if echo "$output" | grep -q "ERROR:"; then
-        echo -e "${RED}❌ Error output:${NC}"
-        echo "$output"
+    # Run Go program and print output
+    go run . "$testfile"
+
+    # Print two new lines
+    echo -e "\n"
+
+    # Print "Right Ans:" and then contents of the result file
+    echo -e "Right Ans:"
+    if [[ -f "$resultfile" ]]; then
+        cat "$resultfile"
     else
-        echo -e "${GREEN}✅ Success. Output:${NC}"
-        echo "$output"
+        echo "Result file not found: $resultfile"
     fi
+    echo -e "\n"
 done
-
-echo -e "\n🎉 All tests finished."
