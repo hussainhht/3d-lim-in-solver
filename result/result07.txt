@@ -1,0 +1,1 @@
+Is the real time less than 2.5 minutes?
