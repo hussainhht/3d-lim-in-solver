@@ -4,5 +4,5 @@ package lemin
 import "fmt"
 
 func DisplayMovement(antID int, roomName string) {
-	fmt.Printf("L%v-%v ", antID+1, roomName)
+	fmt.Printf("L%v-%v ", antID, roomName)
 }
