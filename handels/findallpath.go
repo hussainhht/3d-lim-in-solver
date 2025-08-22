@@ -3,11 +3,13 @@ package lemin
 
 import (
 	// "fmt"
+	"fmt"
 	"sort"
 )
 
 func FindPaths(antFarm *Antsfarm) []*Path {
 	paths := BFS(antFarm)
+	fmt.Println(paths)
 	findBestPaths(&paths)
 	// findBestPaths(&paths)
 	// * Sort paths by length (shortest → longest)
@@ -62,12 +64,12 @@ func pathsOverlap(path1, path2 *Path) bool {
 	rooms := make(map[string]bool)
 
 	// Add all rooms from path1 (except first and last) to the map
-	for i := 1; i < len(path1.Rooms)-1; i++ {
+	for i := 0; i < len(path1.Rooms)-1; i++ {
 		rooms[path1.Rooms[i].Name] = true
 	}
 
 	// Check if any room from path2 (except first and last) exists in path1
-	for i := 1; i < len(path2.Rooms)-1; i++ {
+	for i := 0; i < len(path2.Rooms)-1; i++ {
 		if rooms[path2.Rooms[i].Name] {
 			return true
 		}
