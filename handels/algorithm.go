@@ -104,8 +104,6 @@ func BFS(antFarm *Antsfarm) []*Path {
 	return results
 }
 
-
-
 // Helper: check if a room is already in the path (to avoid cycles)
 func roomInPath(path []*Room, room *Room) bool {
 	for _, r := range path {
