@@ -10,30 +10,30 @@ import (
 
 func RunAlgorithm(antFarm *Antsfarm) {
 	paths := FindPaths(antFarm)
-	fmt.Println("Found paths:")
+	//fmt.Println("Found paths:")
 
 	//! this is not the final printing this is only for debugging
-	for _, path := range paths {
-		fmt.Println(path.String())
-	}
+	// for _, path := range paths {
+	// 	fmt.Println(path.String())
+	// }
 	//print paths to file
-	file, err := os.Create("paths.txt")
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
-	defer file.Close()
-	for _, path := range paths {
-		// write path to file
-		_, err := file.WriteString(path.String() + "\n")
-		if err != nil {
-			fmt.Println("Error writing to file:", err)
-			return
-		}
-	}
+	// file, err := os.Create("paths.txt")
+	// if err != nil {
+	// 	fmt.Println("Error creating file:", err)
+	// 	return
+	// }
+	// defer file.Close()
+	// for _, path := range paths {
+	// 	// write path to file
+	// 	_, err := file.WriteString(path.String() + "\n")
+	// 	if err != nil {
+	// 		fmt.Println("Error writing to file:", err)
+	// 		return
+	// 	}
+	// }
 	// Precompute ant distribution
 	dist := computeAntDistribution(paths, antFarm.TotalAnts)
-	fmt.Println("Ant distribution:", dist)
+	//fmt.Println("Ant distribution:", dist)
 	os.WriteFile("dist.txt", []byte(fmt.Sprintf("%v", dist)), 0644)
 	// fmt.Println("Ant distribution:", dist)
 	for antFarm.DoneAnts < antFarm.TotalAnts {

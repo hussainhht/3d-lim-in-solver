@@ -3,13 +3,13 @@ package lemin
 
 import (
 	// "fmt"
-	"fmt"
+	//"fmt"
 	"sort"
 )
 
 func FindPaths(antFarm *Antsfarm) []*Path {
 	paths := BFS(antFarm)
-	fmt.Println(paths)
+	//fmt.Println(paths)
 	findBestPaths(antFarm, &paths)
 	// findBestPaths(&paths)
 	// * Sort paths by length (shortest → longest)
