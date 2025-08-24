@@ -77,8 +77,76 @@ func pathsOverlap(path1, path2 *Path) bool {
 	return false
 }
 
+// ?find number of rounds
+// Relies on two package-level globals that must exist in this package:
+// var allPaths []*Path
+// var totalAnts int
+// Compute which set yields fewer rounds using Antsfarm + paths (no globals).
+// Returns -1 if currentSet is better (fewer rounds), 1 if bestSet is better, 0 if tie.
+func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, currentSet map[int]bool) int {
+	const INF = int(^uint(0) >> 1)
+
+	roundsFor := func(sel map[int]bool) int {
+		if len(sel) == 0 || antFarm == nil || antFarm.TotalAnts <= 0 {
+			return INF
+		}
+
+		// B_i = len(Rooms) - 1 (base travel time for an empty path)
+		base := make([]int, 0, len(sel))
+		for i, ok := range sel {
+			if !ok || i < 0 || i >= len(paths) || paths[i] == nil {
+				continue
+			}
+			b := len(paths[i].Rooms) - 1
+			base = append(base, b)
+		}
+		if len(base) == 0 {
+			return INF
+		}
+
+		// Binary search bounds: low at shortest base, high at (longest base + total ants)
+		minB, maxB := base[0], base[0]
+		for _, b := range base[1:] {
+			if b < minB { minB = b }
+			if b > maxB { maxB = b }
+		}
+		low, high := minB, maxB+antFarm.TotalAnts
+
+		// Check if T rounds can deliver all ants across the selected paths
+		canDeliver := func(T int) bool {
+			sum := 0
+			for _, b := range base {
+				c := T - b + 1 // contribution of this path
+				if c > 0 {
+					sum += c
+					if sum >= antFarm.TotalAnts { return true }
+				}
+			}
+			return false
+		}
+
+		for low < high {
+			mid := (low + high) / 2
+			if canDeliver(mid) {
+				high = mid
+			} else {
+				low = mid + 1
+			}
+		}
+		return low
+	}
+
+	bestT := roundsFor(bestSet)
+	currT := roundsFor(currentSet)
+
+	if currT < bestT { return -1 }
+	if currT > bestT { return 1 }
+	return 0
+}
+
 // findBestCombination uses backtracking to find the best combination of non-overlapping paths
 func findBestCombination(overlaps map[int]map[int]bool, n int) map[int]bool {
+	
 	bestCombination := make(map[int]bool)
 	currentCombination := make(map[int]bool)
 
@@ -93,7 +161,8 @@ func findBestCombination(overlaps map[int]map[int]bool, n int) map[int]bool {
 				}
 			}
 
-			// Update best combination if current is better
+			// 
+			// ! Update best combination if current is better
 			bestCount := 0
 			for _, included := range bestCombination {
 				if included {
