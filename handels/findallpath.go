@@ -10,7 +10,7 @@ import (
 func FindPaths(antFarm *Antsfarm) []*Path {
 	paths := BFS(antFarm)
 	fmt.Println(paths)
-	findBestPaths(&paths)
+	findBestPaths(antFarm, &paths)
 	// findBestPaths(&paths)
 	// * Sort paths by length (shortest → longest)
 	// the first input is the path being sorted, the second input is the function
@@ -26,7 +26,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 }
 
 // findBestPaths selects the best set of non-overlapping paths from all paths
-func findBestPaths(paths *[]*Path) {
+func findBestPaths(antFarm *Antsfarm, paths *[]*Path) {
 	n := len(*paths)
 	if n == 0 {
 		return
@@ -35,24 +35,24 @@ func findBestPaths(paths *[]*Path) {
 	// Build overlap map: overlaps[i][j] = true if path i and j share rooms
 	overlaps := make(map[int]map[int]bool)
 	for i := range *paths {
-        overlaps[i] = make(map[int]bool)
-        for j := range *paths {
-            if i != j && pathsOverlap((*paths)[i], (*paths)[j]) {
-                overlaps[i][j] = true
-            }
-        }
-    }    
+		overlaps[i] = make(map[int]bool)
+		for j := range *paths {
+			if i != j && pathsOverlap((*paths)[i], (*paths)[j]) {
+				overlaps[i][j] = true
+			}
+		}
+	}
 
 	// Find best combination using backtracking
-	bestCombo := findBestCombination(overlaps, n)
+	bestCombo := findBestCombination(antFarm, *paths, overlaps, n)
 
 	// Collect the paths that are in the best combination
-    var bestPaths []*Path
-    for i := range *paths {
-        if bestCombo[i] {
-            bestPaths = append(bestPaths, (*paths)[i])
-        }
-    }    
+	var bestPaths []*Path
+	for i := range *paths {
+		if bestCombo[i] {
+			bestPaths = append(bestPaths, (*paths)[i])
+		}
+	}
 
 	// Update the original slice
 	*paths = bestPaths
@@ -107,8 +107,12 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 		// Binary search bounds: low at shortest base, high at (longest base + total ants)
 		minB, maxB := base[0], base[0]
 		for _, b := range base[1:] {
-			if b < minB { minB = b }
-			if b > maxB { maxB = b }
+			if b < minB {
+				minB = b
+			}
+			if b > maxB {
+				maxB = b
+			}
 		}
 		low, high := minB, maxB+antFarm.TotalAnts
 
@@ -119,7 +123,9 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 				c := T - b + 1 // contribution of this path
 				if c > 0 {
 					sum += c
-					if sum >= antFarm.TotalAnts { return true }
+					if sum >= antFarm.TotalAnts {
+						return true
+					}
 				}
 			}
 			return false
@@ -139,49 +145,41 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 	bestT := roundsFor(bestSet)
 	currT := roundsFor(currentSet)
 
-	if currT < bestT { return -1 }
-	if currT > bestT { return 1 }
+	if currT < bestT {
+		return -1
+	}
+	if currT > bestT {
+		return 1
+	}
 	return 0
 }
 
 // findBestCombination uses backtracking to find the best combination of non-overlapping paths
-func findBestCombination(overlaps map[int]map[int]bool, n int) map[int]bool {
-	
+// It picks the set with the least number of rounds, not just the most paths
+func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[int]bool, n int) map[int]bool {
 	bestCombination := make(map[int]bool)
 	currentCombination := make(map[int]bool)
 
-	var tryPath func(pathIndex int) int
-	tryPath = func(pathIndex int) int {
+	var tryPath func(pathIndex int)
+	tryPath = func(pathIndex int) {
 		if pathIndex == n {
-			// Count current combination size
-			count := 0
-			for _, included := range currentCombination {
-				if included {
-					count++
-				}
-			}
-
-			// 
-			// ! Update best combination if current is better
-			bestCount := 0
-			for _, included := range bestCombination {
-				if included {
-					bestCount++
-				}
-			}
-			if count > bestCount {
+			// Compare with best using numberOfRounds
+			cmp := numberOfRounds(antFarm, paths, bestCombination, currentCombination)
+			if cmp > 0 { 
+				// currentCombination is better
+				bestCombination = make(map[int]bool)
 				for k, v := range currentCombination {
 					bestCombination[k] = v
 				}
 			}
-			return count
+			return
 		}
 
 		// Try excluding current path
 		currentCombination[pathIndex] = false
-		exclude := tryPath(pathIndex + 1)
+		tryPath(pathIndex + 1)
 
-		// Check if we can include current path
+		// Try including current path if no conflict
 		canInclude := true
 		for other := 0; other < pathIndex; other++ {
 			if currentCombination[other] && overlaps[pathIndex][other] {
@@ -189,23 +187,17 @@ func findBestCombination(overlaps map[int]map[int]bool, n int) map[int]bool {
 				break
 			}
 		}
-
-		var include int
 		if canInclude {
 			currentCombination[pathIndex] = true
-			include = tryPath(pathIndex + 1)
-			if include > exclude {
-				return include
-			}
+			tryPath(pathIndex + 1)
+			currentCombination[pathIndex] = false
 		}
-
-		currentCombination[pathIndex] = false
-		return exclude
 	}
 
 	tryPath(0)
 	return bestCombination
 }
+
 
 // FilterCheckCompare compares paths and only keeps the useful ones.
 func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
@@ -239,7 +231,7 @@ func UpdatePath(antFarm *Antsfarm, path *Path, dist *map[string]int) {
 	if (*dist)[path.String()] > 0 {
 
 		//assign ants to path if there are still ants left
-		
+
 		// if (*dist)[path] <= 0 {
 		// 	return
 		// }
@@ -252,7 +244,7 @@ func UpdatePath(antFarm *Antsfarm, path *Path, dist *map[string]int) {
 		// }
 		// path.Ants = append([]*Ant{newAnt}, path.Ants...)
 		// path.Rooms[0].Ant = newAnt // assign ant to start room
-		
+
 		// antFarm.NextAnt++
 		// (*dist)[path]--
 		// DisplayMovement(newAnt.ID, antFarm.StartRoom.Name)
