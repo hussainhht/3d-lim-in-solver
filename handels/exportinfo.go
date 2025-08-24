@@ -12,6 +12,10 @@ import (
 // readFile parses the lem-in input from text.txt in the current working directory
 // and returns a populated Antsfarm structure.
 func ReadFile(f_name string) *Antsfarm {
+	if !strings.HasSuffix(strings.TrimSpace(f_name), ".txt") {
+		fmt.Println("File name must end with .txt")
+		os.Exit(1)
+	}
 	//? f_name := "input file name"
 	f, err := os.Open(f_name)
 	if err != nil {
