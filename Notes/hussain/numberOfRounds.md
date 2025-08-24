@@ -1,175 +1,169 @@
-تمام يا دكتور حسين، بشرحها مرّة ثانية خطوة-بخطوة وبأسلوب مبسّط بس دقيق 👇
-
-# وش تسوي `numberOfRounds`
-
-الدالة تقارن بين **مجموعتين من المسارات**:
-
-- `bestSet`
-    
-- `currentSet`
-    
-
-كل مجموعة عبارة عن `map[int]bool`، يعني “اختيارات” لمسارات داخل المصفوفة `paths` (الفهرس هو مفتاح الـ map).
-
-الهدف: نعرف أي مجموعة تحتاج **عدد لفّات (Rounds) أقل** عشان نخلّص نقل كل النمل (`antFarm.TotalAnts`) من البداية للنهاية.  
-النتيجة:
-
-- ترجع `-1` إذا `currentSet` أحسن (أقل لفّات).
-    
-- ترجع `1` إذا `bestSet` أحسن.
-    
-- ترجع `0` إذا تعادلوا.
-    
-
-> ملاحظة: هنا ما نحاكي الحركة خطوة بخطوة؛ نقيسها بصيغة رياضية سريعة — وهذا استخدامها شائع في مشروع lem-in.
+Here’s a clear, step-by-step explanation—in English—of what your `numberOfRounds` function does and how it works.
 
 ---
 
-# كيف تقيس عدد اللفات لمجموعة واحدة؟
+## What the function does (in one line)
 
-داخلها في دالة داخلية اسمها `roundsFor(sel map[int]bool) int`، وهذي اللي تحسب **أقل عدد لفّات T** تكفي لنقل كل النمل عبر المسارات المختارة في `sel`.
+It compares two _sets of paths_ and returns which set finishes sending **all ants** from start to end in **fewer rounds**.
 
-## 1) حمايات أولية
-
-```go
-if len(sel) == 0 || antFarm == nil || antFarm.TotalAnts <= 0 {
-    return INF
-}
-```
-
-- لو المجموعة فاضية، أو ما عندنا مزرعة/عدد نمل صحيح → رجّع قيمة كبيرة جدًا (`INF`) كإشارة إنها مجموعة “سيئة”.
+- Returns **-1** → `currentSet` is better (fewer rounds)
+    
+- Returns **1** → `bestSet` is better
+    
+- Returns **0** → tie
     
 
-## 2) حساب “زمن الأساس” لكل مسار
+**Inputs**
 
-```go
-b := len(paths[i].Rooms) - 1
-```
-
-نسمّيه BiB_i.  
-هو عدد الحركات (edges) من البداية للنهاية لمسار فاضي. مثال: لو المسار فيه 6 غرف، فـ B=5B = 5.
-
-نخزّن كل BiB_i لمسارات المجموعة في مصفوفة `base`.
-
-## 3) نحدّد مجال البحث لـ T
-
-```go
-minB = أصغر B_i
-maxB = أكبر B_i
-low  = minB
-high = maxB + antFarm.TotalAnts
-```
-
-- أقل لفّة منطقية تبدأ من أقصر مسار.
+- `antFarm *Antsfarm`: used for `TotalAnts`
     
-- حد علوي آمن: أطول مسار + عدد النمل (مبالغة مقصودة عشان يضمن نلقى حل).
+- `paths []*Path`: all available paths (each path has `Rooms`)
     
-
-## 4) اختبار “هل T يكفي؟” → `canDeliver(T)`
-
-```go
-c := T - b + 1
-if c > 0 { sum += c }
-return sum >= antFarm.TotalAnts
-```
-
-الفكرة: في TT لفّة، **المسار الواحد** يقدر “يمرّر” تقريبًا  
-max⁡(0,  T−Bi+1)\max(0,\; T - B_i + 1) نمل.  
-نجمع مساهمات كل المسارات المختارة، وإذا وصلنا أو تعدّينا `TotalAnts` → هالـ T يكفي.
-
-> ليش الصيغة T−Bi+1T - B_i + 1؟  
-> لأن أول نملة على مسار بطول BiB_i توصل النهاية بعد BiB_i لفّات. بعد هالوقت، كل لفّة إضافية تقدر “تطلق” نملة جديدة على هالمسار (أنبوب/بايبلاين). فإجمالي ما “يمرّ” حتى اللفة T يطلع هالعدد (ما دون الصفر نتجاهله).
-
-## 5) نستخدم **بحث ثنائي** لنتيجة مضبوطة وسريعة
-
-```go
-for low < high {
-    mid := (low + high) / 2
-    if canDeliver(mid) { high = mid } else { low = mid + 1 }
-}
-return low
-```
-
-نطلع **أصغر** TT ممكن.
+- `bestSet`, `currentSet`: maps of selected path indices (`map[int]bool`)
+    
 
 ---
 
-# بعدين نقارن المجموعتين
+## Core idea (pipeline model)
+
+For a selected path with base time Bi=len(Rooms)−1B_i = \text{len(Rooms)} - 1:
+
+- The _first_ ant to enter that path reaches the end after BiB_i rounds.
+    
+- After that, the path can output **one ant per round** (like a pipeline).
+    
+
+So, within TT total rounds, **one** path can deliver:
+
+max⁡(0,  T−Bi+1)\max(0,\; T - B_i + 1)
+
+ants. Across all selected paths, the total delivered by round TT is:
+
+∑imax⁡(0,  T−Bi+1)\sum_i \max(0,\; T - B_i + 1)
+
+We want the **smallest** TT such that this sum ≥ `TotalAnts`.
+
+---
+
+## How the code computes that
+
+Inside `numberOfRounds`, there’s an inner helper:
+
+### `roundsFor(sel map[int]bool) int`
+
+Computes the minimal number of rounds TT needed by the selected set `sel`.
+
+1. **Guard rails**
+    
+
+```go
+if len(sel) == 0 || antFarm == nil || antFarm.TotalAnts <= 0 { return INF }
+```
+
+If the set is empty or the inputs are invalid, it returns a very large number `INF` (sentinel “bad set”).
+
+> `INF := int(^uint(0) >> 1)` is a standard trick to get `math.MaxInt` for the platform.
+
+2. **Collect base times**
+    
+
+```go
+B_i = len(paths[i].Rooms) - 1
+```
+
+Build a `base` slice of all BiB_i for the selected indices.
+
+3. **Binary search bounds**
+    
+
+```go
+low  = min(B_i)
+high = max(B_i) + TotalAnts
+```
+
+- The minimal plausible rounds start at the shortest BiB_i.
+    
+- The upper bound is safely large (longest base plus number of ants).
+    
+
+4. **Feasibility check: `canDeliver(T)`**
+    
+
+```go
+sum += max(0, T - B + 1)  // for each selected path
+return sum >= TotalAnts
+```
+
+If at round `T` the selected paths can deliver at least `TotalAnts` ants, it’s feasible.
+
+5. **Binary search for the minimal T**  
+    Standard binary search shrinks `[low, high]` to the smallest feasible `T`.
+    
+
+### Final comparison
 
 ```go
 bestT := roundsFor(bestSet)
 currT := roundsFor(currentSet)
-
-if currT < bestT { return -1 }
-if currT > bestT { return 1 }
-return 0
 ```
 
-- الأقل = الأفضل.
+- If `currT < bestT` → return `-1`
+    
+- If `currT > bestT` → return `1`
+    
+- Else → `0`
     
 
 ---
 
-# مثال سريع (عشان تتثبت الفكرة)
+## Example (quick sanity check)
 
-افترض:
-
+- Paths in the set: B=[3,5]B = [3, 5]
+    
 - `TotalAnts = 10`
     
-- مجموعة فيها مسارين:
-    
-    - مسار A: BA=3B_A = 3
-        
-    - مسار B: BB=5B_B = 5
-        
 
-جرّب T=7T = 7:
+Try T=7T = 7:
 
-- A يعطي 7−3+1=57 - 3 + 1 = 5 نمل
+- Path with B=3B=3 gives 7−3+1=57 - 3 + 1 = 5 ants
     
-- B يعطي 7−5+1=37 - 5 + 1 = 3 نمل  
-    المجموع = 8 < 10 → ما يكفي
+- Path with B=5B=5 gives 7−5+1=37 - 5 + 1 = 3 ants  
+    Total = 8 < 10 → not enough.
     
 
-جرّب T=8T = 8:
+Try T=8T = 8:
 
-- A = 6
+- B=3B=3 → 6 ants
     
-- B = 4  
-    المجموع = 10 → يكفي  
-    إذن أقل TT يساوي 8 لفّات.
+- B=5B=5 → 4 ants  
+    Total = 10 → enough.  
+    **Minimal** T=8T = 8.
     
 
 ---
 
-# شغلات مهمّة (Pitfalls)
+## Complexity
 
-- **Off-by-one**: التأكد إنك تستخدم `len(Rooms) - 1` مو `len(Rooms)`.
+For a set with kk paths:
+
+- Each feasibility check is O(k)O(k)
     
-- الـ `map[int]bool` لازم مفاتيحها صالحة داخل `paths` (الكود يتحقق ويتخطّى الباطل بس الأفضل تنتبه).
+- Binary search runs about log⁡(maxB+TotalAnts)\log(\text{maxB} + \text{TotalAnts}) steps  
+    Overall per set: O ⁣(k⋅log⁡(maxB+TotalAnts))O\!\left(k \cdot \log(\text{maxB} + \text{TotalAnts})\right)  
+    You run it twice (once per set).
     
-- لو المجموعة فاضية أو ما فيها أي مسار صالح، `roundsFor` يرجّع `INF` وبالتالي بتنهزم أمام أي مجموعة فيها مسارات.
-    
-- التعقيد الحسابي:
-    
-    - بناء `base`: O(k)O(k) حيث kk = عدد المسارات المختارة.
-        
-    - كل اختبار `canDeliver`: O(k)O(k).
-        
-    - البحث الثنائي يدور تقريبًا على log⁡(maxB+TotalAnts)\log(\text{maxB} + \text{TotalAnts}).
-        
-    - الإجمالي: O(klog⁡(maxB+TotalAnts))O\big(k \log(\text{maxB}+\text{TotalAnts})\big) لكل مجموعة، ثم مقارنة مجموعتين.
-        
 
 ---
 
-# كيف تناديها
+## Edge cases & tips
 
-```go
-res := numberOfRounds(antFarm, paths, bestSet, currentSet)
-// -1 => currentSet أفضل
-//  1 => bestSet أفضل
-//  0 => تعادل
-```
+- Empty or invalid set → treated as `INF` (always worse).
+    
+- Make sure selected indices are valid for `paths`.
+    
+- Using `len(Rooms) - 1` is crucial to avoid off-by-one bugs.
+    
+- This approach is **analytical** (no step-by-step simulation), so it’s fast and reliable for selection logic.
+    
 
-إذا ودّك، أقدر أضيف لك دالة ثانية ترجع **T نفسه** لمجموعة معيّنة (بدون مقارنة)، أو أطلع لك أيضًا **توزيع النمل** لكل مسار عند الـ T الأمثل. قول تم وبجهزها 👌
+If you want, I can add a helper like `minRoundsForSet(antFarm, paths, set)` that returns the actual TT (not just comparison) or even compute the **optimal ant distribution per path** at that TT.
