@@ -138,7 +138,16 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 			} else {
 				low = mid + 1
 			}
+
+			// safety net: prevent infinite loop
+			if high-low <= 1 {
+				if canDeliver(low) {
+					return low
+				}
+				return high
+			}
 		}
+
 		return low
 	}
 
@@ -165,7 +174,7 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 		if pathIndex == n {
 			// Compare with best using numberOfRounds
 			cmp := numberOfRounds(antFarm, paths, bestCombination, currentCombination)
-			if cmp > 0 { 
+			if cmp < 0 {
 				// currentCombination is better
 				bestCombination = make(map[int]bool)
 				for k, v := range currentCombination {
@@ -197,7 +206,6 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 	tryPath(0)
 	return bestCombination
 }
-
 
 // FilterCheckCompare compares paths and only keeps the useful ones.
 func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
