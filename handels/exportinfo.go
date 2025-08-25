@@ -177,9 +177,13 @@ func ReadFile(f_name string) *Antsfarm {
 		return nil
 	}
 
+	if len(farm.StartRoom.Links) == 0 {
+		log.Fatal("Missing links from start room")
+	}
+
 	if len(farm.EndRoom.Links) == 0 {
-		log.Fatal("Missing end room")
-	} 
+		log.Fatal("Missing links from end room")
+	}
 
 	return farm
 }
