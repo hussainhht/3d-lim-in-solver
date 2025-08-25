@@ -55,6 +55,9 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Invalid ants:", line)
 				return nil
 			}
+			if ants > 100000 {
+				log.Fatal("Too many ants (>100000)")
+			}
 			farm.TotalAnts = ants
 			parsedAnts = true
 			continue
