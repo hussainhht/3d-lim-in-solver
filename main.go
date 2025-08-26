@@ -58,6 +58,5 @@ func main() {
 	lemin.WriteFile(lemin.TakeData(FileName))
 
 	lemin.RunAlgorithm(farm)
-	
-	
+
 }

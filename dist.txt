@@ -1,1 +1,1 @@
-&map[Path: [0 o n e end]:33 Path: [h A c k end]:33 Path: [t E a m end]:34]
+&map[Path: [dinish jimYoung peter]:50000 Path: [erlich gilfoyle peter]:50000]
