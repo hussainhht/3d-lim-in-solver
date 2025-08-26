@@ -72,7 +72,8 @@ func main() {
 		Projection: rl.CameraPerspective,
 	}
 
-	ants := 5
+		//! Ants
+	ants := farm.TotalAnts
 	phase := make([]float32, ants)
 	for i := 0; i < ants; i++ {
 		phase[i] = float32(i) * 0.35
