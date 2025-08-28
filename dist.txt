@@ -1,1 +1,1 @@
-&map[Path: [dinish jimYoung peter]:50000 Path: [erlich gilfoyle peter]:50000]
+&map[Path: [A0 D1 F2 H3 H4 A2 end]:15 Path: [B0 B1 E2 D2 F3 F4 end]:15 Path: [C0 C1 C2 C3 I4 I5 end]:15 Path: [G0 G1 G2 G3 G4 D3 end]:15]

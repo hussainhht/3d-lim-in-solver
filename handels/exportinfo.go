@@ -19,6 +19,7 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("File name must end with .txt")
 		os.Exit(1)
 	}
+	
 	//? f_name := "input file name"
 	f, err := os.Open(f_name)
 	if err != nil {
