@@ -1,5 +1,7 @@
 package lemin
 
+// * finish revision
+
 import (
 	"bufio"
 	"errors"
@@ -13,7 +15,7 @@ import (
 var Endlink bool = false
 
 // readFile parses the lem-in input from text.txt in the current working directory
-// and returns a populated Antsfarm structure.
+// * and returns a populated Antsfarm structure.
 func ReadFile(f_name string) *Antsfarm {
 	if !strings.HasSuffix(strings.TrimSpace(f_name), ".txt") {
 		fmt.Println("File name must end with .txt")
@@ -47,6 +49,8 @@ func ReadFile(f_name string) *Antsfarm {
 			continue
 		}
 
+
+		// Check for valid ants line
 		if !parsedAnts {
 			if strings.HasPrefix(line, "#") { // comments before ants line
 				continue
@@ -56,9 +60,12 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Invalid ants:", line)
 				return nil
 			}
-			if ants > 100000 {
-				log.Fatal("Too many ants (>100000)")
+
+			// Check for too many ants
+			if ants > 1000000 {
+				log.Fatal("Too many ants (>1000000)")
 			}
+
 			farm.TotalAnts = ants
 			parsedAnts = true
 			continue
@@ -66,10 +73,13 @@ func ReadFile(f_name string) *Antsfarm {
 
 		// Commands or comments
 		if strings.HasPrefix(line, "##") {
-			if linkSection { // commands not allowed after link section begins
+			
+			if linkSection && (line == "##start" || line == "##end") { // commands not allowed after link section begins
 				fmt.Println("Command after links started:", line)
 				return nil
 			}
+			
+			// Check for valid start/end commands
 			switch line {
 			case "##start":
 				if farm.StartRoom != nil {
@@ -90,13 +100,17 @@ func ReadFile(f_name string) *Antsfarm {
 			}
 			continue
 		}
+
 		if strings.HasPrefix(line, "#") { // normal comment
 			continue
 		}
 
-		// Determine if link line
+		// * Determine if link line
 		if isLinkLine(line) {
+
 			linkSection = true
+
+			// Reset start/end expectations
 			name1, name2 := parseLinkLine(line)
 			r1, ok1 := farm.Rooms[name1]
 			r2, ok2 := farm.Rooms[name2]
@@ -104,10 +118,13 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Link references unknown room:", line)
 				return nil
 			}
+
+			// * Add link, checking for self-loops and duplicates
 			if err := addLink(r1, r2); err != nil {
 				fmt.Println("Error adding link:", err)
 				return nil
 			}
+
 			// After consuming a link, pending start/end expectation is invalid
 			if expectStart || expectEnd {
 				fmt.Println("Expected room after command, found link:", line)
@@ -116,25 +133,28 @@ func ReadFile(f_name string) *Antsfarm {
 			continue
 		}
 
-		// If link section already started, no more room definitions allowed
+		// * If link section already started, no more room definitions allowed
 		if linkSection {
 			fmt.Println("Room definition after links started:", line)
 			return nil
 		}
 
 		// Room line
+		// Format: name x y
 		parts := strings.Fields(line)
 		if len(parts) != 3 {
-			fmt.Println("Invalid room format:", line)
+			log.Println("Invalid room format:", line)
 			return nil
 		}
+
+		// Validate room name
 		name := parts[0]
 		if err := validateRoomName(name); err != nil {
-			fmt.Println("Invalid room name:", line)
+			log.Println("Invalid room name:", line)
 			return nil
 		}
 		if _, exists := farm.Rooms[name]; exists {
-			fmt.Println("Duplicate room name:", line)
+			log.Println("Duplicate room name:", line)
 			return nil
 		}
 		x, errX := strconv.Atoi(parts[1])
@@ -145,7 +165,7 @@ func ReadFile(f_name string) *Antsfarm {
 		}
 		coordKey := fmt.Sprintf("%d:%d", x, y)
 		if other := coordSet[coordKey]; other != "" {
-			fmt.Println("Duplicate room coordinates:", line)
+			log.Println("Duplicate room coordinates:", line)
 			return nil
 		}
 		r := &Room{Name: name, X: x, Y: y}
@@ -192,7 +212,7 @@ func ReadFile(f_name string) *Antsfarm {
 	return farm
 }
 
-// String returns a concise summary of the parsed farm.
+// *String returns a concise summary of the parsed farm.
 func (f *Antsfarm) String() string {
 	if f == nil {
 		return "<nil farm>"
@@ -214,7 +234,7 @@ func (f *Antsfarm) String() string {
 	return fmt.Sprintf("ants=%d rooms=%d links=%d start=%s end=%s", f.TotalAnts, len(f.Rooms), linkCount, start, end)
 }
 
-// validateRoomName enforces lem-in constraints on room names.
+// *validateRoomName enforces lem-in constraints on room names.
 func validateRoomName(name string) error {
 	if name == "" {
 		return errors.New("empty room name")
@@ -228,7 +248,7 @@ func validateRoomName(name string) error {
 	return nil
 }
 
-// isLinkLine decides if a trimmed line represents a link (format name1-name2, no spaces).
+// *isLinkLine decides if a trimmed line represents a link (format name1-name2, no spaces).
 func isLinkLine(line string) bool {
 	if strings.Contains(line, " ") || strings.Contains(line, "\t") {
 		return false
@@ -243,13 +263,13 @@ func isLinkLine(line string) bool {
 	return true
 }
 
-// parseLinkLine splits a validated link line into room names.
+// *parseLinkLine splits a validated link line into room names.
 func parseLinkLine(line string) (string, string) {
 	parts := strings.SplitN(line, "-", 2)
 	return parts[0], parts[1]
 }
 
-// addLink adds an undirected edge between two rooms, enforcing constraints.
+// * addLink adds an undirected edge between two rooms, enforcing constraints.
 func addLink(a, b *Room) error {
 	if a == nil || b == nil {
 		return errors.New("nil room in link")
