@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -45,7 +46,6 @@ func ReadFile(f_name string) *Antsfarm {
 			continue
 		}
 
-
 		// Check for valid ants line
 		if !parsedAnts {
 			if strings.HasPrefix(line, "#") { // comments before ants line
@@ -56,15 +56,12 @@ func ReadFile(f_name string) *Antsfarm {
 				fmt.Println("Invalid ants:", line)
 				return nil
 			}
-<<<<<<< HEAD
-=======
 
 			// Check for too many ants
 			if ants > 1000000 {
 				log.Fatal("Too many ants (>1000000)")
 			}
 
->>>>>>> fad7d92308a3f2d6e4fefaaae372d1fd3358c725
 			farm.TotalAnts = ants
 			parsedAnts = true
 			continue
@@ -72,12 +69,12 @@ func ReadFile(f_name string) *Antsfarm {
 
 		// Commands or comments
 		if strings.HasPrefix(line, "##") {
-			
+
 			if linkSection && (line == "##start" || line == "##end") { // commands not allowed after link section begins
 				fmt.Println("Command after links started:", line)
 				return nil
 			}
-			
+
 			// Check for valid start/end commands
 			switch line {
 			case "##start":
