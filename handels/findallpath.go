@@ -4,15 +4,11 @@ package lemin
 import (
 	// "fmt"
 	//"fmt"
-	"log"
 	"sort"
 )
 
 func FindPaths(antFarm *Antsfarm) []*Path {
 	paths := BFS(antFarm)
-	if len(paths) == 0 {
-		log.Fatal("No paths found from start to end")
-	}
 	//fmt.Println(paths)
 	findBestPaths(antFarm, &paths)
 	// findBestPaths(&paths)
