@@ -10,7 +10,6 @@ import (
 
 func RunAlgorithm(antFarm *Antsfarm) {
 	paths := FindPaths(antFarm)
-	//fmt.Println("Found paths:")
 
 	//! this is not the final printing this is only for debugging
 	// for _, path := range paths {
