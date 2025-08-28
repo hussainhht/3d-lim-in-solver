@@ -1,4 +1,4 @@
-9
+60
 #rooms
 ##start
 start 0 3
@@ -64,4 +64,5 @@ F3-F4
 F4-end
 I4-I5
 I5-end
+
 

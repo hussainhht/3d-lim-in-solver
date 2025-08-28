@@ -4,10 +4,13 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"strings"
 )
+
+var Endlink bool = false
 
 // readFile parses the lem-in input from text.txt in the current working directory
 // and returns a populated Antsfarm structure.
@@ -16,6 +19,7 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("File name must end with .txt")
 		os.Exit(1)
 	}
+	
 	//? f_name := "input file name"
 	f, err := os.Open(f_name)
 	if err != nil {
@@ -51,6 +55,9 @@ func ReadFile(f_name string) *Antsfarm {
 			if err != nil || ants <= 0 {
 				fmt.Println("Invalid ants:", line)
 				return nil
+			}
+			if ants > 100000 {
+				log.Fatal("Too many ants (>100000)")
 			}
 			farm.TotalAnts = ants
 			parsedAnts = true
@@ -173,6 +180,15 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("File ended before room after start/end command")
 		return nil
 	}
+
+	if len(farm.StartRoom.Links) == 0 {
+		log.Fatal("Missing links from start room")
+	}
+
+	if len(farm.EndRoom.Links) == 0 {
+		log.Fatal("Missing links from end room")
+	}
+
 	return farm
 }
 

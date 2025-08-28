@@ -58,6 +58,6 @@ func TakeData(f_name string) string {
 	for scanner.Scan() {
 		data += scanner.Text() + "\n"
 	}
-
+	fmt.Println(data)
 	return string(data + "\n")
 }
