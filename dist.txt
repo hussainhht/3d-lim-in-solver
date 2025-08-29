@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-&map[Path: [A0 D1 F2 F3 F4 end]:3 Path: [B0 B1 E2 D2 D3 end]:3 Path: [C0 C1 C2 C3 A2 end]:3]
-=======
 &map[Path: [2 3 1]:4]
->>>>>>> fad7d92308a3f2d6e4fefaaae372d1fd3358c725

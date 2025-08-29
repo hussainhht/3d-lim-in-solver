@@ -10,11 +10,7 @@ for i in {00..05}; do
     echo -e "▶️  Running: example$i.txt"
     echo -e "\n"
 
-    if [[ -f "$testfile" ]]; then
-        cat "$testfile"
-    else
-        echo "Result file not found: $testfile"
-    fi
+   
 
     echo -e "\n"
 

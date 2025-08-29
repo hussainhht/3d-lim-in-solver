@@ -3,12 +3,12 @@ package lemin
 import (
 	"fmt"
 	"os"
-	"sort"
 )
 
 // todo run algo
 
 func RunAlgorithm(antFarm *Antsfarm) {
+
 	paths := FindPaths(antFarm)
 
 	//! this is not the final printing this is only for debugging
@@ -32,9 +32,8 @@ func RunAlgorithm(antFarm *Antsfarm) {
 	// }
 	// Precompute ant distribution
 	dist := computeAntDistribution(paths, antFarm.TotalAnts)
-	//fmt.Println("Ant distribution:", dist)
+
 	os.WriteFile("dist.txt", []byte(fmt.Sprintf("%v", dist)), 0644)
-	// fmt.Println("Ant distribution:", dist)
 	for antFarm.DoneAnts < antFarm.TotalAnts {
 		resetVisited(paths)
 		for _, path := range paths { // move ants in paths forward
@@ -65,6 +64,7 @@ func resetVisited(paths []*Path) {
 
 // TODO: Implement pathfinding algorithm
 func BFS(antFarm *Antsfarm) []*Path {
+
 	var results []*Path
 	start := antFarm.StartRoom
 
@@ -83,6 +83,7 @@ func BFS(antFarm *Antsfarm) []*Path {
 
 		lastRoom := path[len(path)-1]
 
+		// Check if we reached the end room
 		if lastRoom == antFarm.EndRoom {
 			// Found a complete path, store without start room
 			results = append(results, &Path{Rooms: path})
@@ -121,11 +122,11 @@ func computeAntDistribution(paths []*Path, totalAnts int) *map[string]int {
 	}
 
 	//! not important
-	sort.Slice(paths,
-		func(i, j int) bool {
-			return len(paths[i].Rooms) < len(paths[j].Rooms)
-		},
-	)
+	// sort.Slice(paths,
+	// 	func(i, j int) bool {
+	// 		return len(paths[i].Rooms) < len(paths[j].Rooms)
+	// 	},
+	// )
 
 	// Calculate distribution using "turns equalization"
 	remaining := totalAnts
@@ -133,6 +134,7 @@ func computeAntDistribution(paths []*Path, totalAnts int) *map[string]int {
 		dist[path.String()] = 0
 	}
 
+	// Find path with minimum (length + assigned ants)
 	for remaining > 0 {
 		// Find path with minimum (length + assigned ants)
 		minTurns := int(^uint(0) >> 1) // Max int

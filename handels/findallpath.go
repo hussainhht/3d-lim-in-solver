@@ -2,20 +2,22 @@
 package lemin
 
 import (
-	// "fmt"
-	//"fmt"
+	
 	"log"
 	"sort"
 )
 
 func FindPaths(antFarm *Antsfarm) []*Path {
+
+	// Find all paths from start to end
 	paths := BFS(antFarm)
+
 	if len(paths) == 0 {
 		log.Fatal("No paths found from start to end")
 	}
-	//fmt.Println(paths)
+
 	findBestPaths(antFarm, &paths)
-	// findBestPaths(&paths)
+	
 	// * Sort paths by length (shortest → longest)
 	// the first input is the path being sorted, the second input is the function
 	// the function works like this [1 2] 3 checks the condition if it's true it swaps them
@@ -24,6 +26,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 		return len(paths[i].Rooms) > len(paths[j].Rooms)
 	})
 
+	// Remove paths that are not useful
 	paths = FilterCheckCompare(paths, antFarm.TotalAnts)
 
 	return paths
@@ -38,6 +41,7 @@ func findBestPaths(antFarm *Antsfarm, paths *[]*Path) {
 
 	// Build overlap map: overlaps[i][j] = true if path i and j share rooms
 	overlaps := make(map[int]map[int]bool)
+
 	for i := range *paths {
 		overlaps[i] = make(map[int]bool)
 		for j := range *paths {
@@ -170,6 +174,7 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 // findBestCombination uses backtracking to find the best combination of non-overlapping paths
 // It picks the set with the least number of rounds, not just the most paths
 func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[int]bool, n int) map[int]bool {
+
 	bestCombination := make(map[int]bool)
 	currentCombination := make(map[int]bool)
 
@@ -210,6 +215,8 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 	tryPath(0)
 	return bestCombination
 }
+
+
 
 // FilterCheckCompare compares paths and only keeps the useful ones.
 func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
