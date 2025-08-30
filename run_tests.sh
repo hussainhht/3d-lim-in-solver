@@ -30,7 +30,3 @@ for i in {00..05}; do
     echo -e "\n"
 done
 
-
-groupie-tracker-visualizations
-
-

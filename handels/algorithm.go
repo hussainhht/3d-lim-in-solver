@@ -2,7 +2,6 @@ package lemin
 
 import (
 	"fmt"
-	"os"
 )
 
 // todo run algo
@@ -11,36 +10,13 @@ func RunAlgorithm(antFarm *Antsfarm) {
 
 	paths := FindPaths(antFarm)
 
-	//! this is not the final printing this is only for debugging
-	// for _, path := range paths {
-	// 	fmt.Println(path.String())
-	// }
-	//print paths to file
-	// file, err := os.Create("paths.txt")
-	// if err != nil {
-	// 	fmt.Println("Error creating file:", err)
-	// 	return
-	// }
-	// defer file.Close()
-	// for _, path := range paths {
-	// 	// write path to file
-	// 	_, err := file.WriteString(path.String() + "\n")
-	// 	if err != nil {
-	// 		fmt.Println("Error writing to file:", err)
-	// 		return
-	// 	}
-	// }
-	// Precompute ant distribution
 	dist := computeAntDistribution(paths, antFarm.TotalAnts)
 
-	os.WriteFile("dist.txt", []byte(fmt.Sprintf("%v", dist)), 0644)
 	for antFarm.DoneAnts < antFarm.TotalAnts {
 		resetVisited(paths)
 		for _, path := range paths { // move ants in paths forward
-			// fmt.Println("1")
 			UpdatePath(antFarm, path, dist)
 		}
-		// fmt.Println(dist)
 		AssignAntsToPath(antFarm, paths, dist)
 		fmt.Println()
 	}
@@ -54,15 +30,8 @@ func resetVisited(paths []*Path) {
 	}
 }
 
-// ? why this unused
-// func isPathAvailable(path *Path) bool {
-// 	if path.Rooms[0].Ant != nil || path.Rooms[0].Visited {
-// 		return false
-// 	}
-// 	return true
-// }
 
-// TODO: Implement pathfinding algorithm
+// * FindPaths uses BFS to find all paths from start to end in the ant farm.
 func BFS(antFarm *Antsfarm) []*Path {
 
 	var results []*Path
