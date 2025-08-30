@@ -39,15 +39,15 @@ package lemin
 
 func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist *map[string]int) {
 	for _, path := range paths {
-		// fmt.Println(dist)
+		
 
 		if (*dist)[path.String()] <= 0 {
 			continue
 		}
-		// fmt.Println("1")
+		
 
 		if len(path.Rooms) == 1 {
-			// fmt.Println("1")
+			
 
 			newAnt := &Ant{
 				ID:       antFarm.NextAnt + 1,

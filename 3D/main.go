@@ -4,7 +4,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	lemin "lemin/handels"
+	lemin "lemin/handles"
 	"log"
 	"math"
 	"time"

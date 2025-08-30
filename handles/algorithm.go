@@ -15,13 +15,14 @@ func RunAlgorithm(antFarm *Antsfarm) {
 	for antFarm.DoneAnts < antFarm.TotalAnts {
 		resetVisited(paths)
 		for _, path := range paths { // move ants in paths forward
-			UpdatePath(antFarm, path, dist)
+			UpdatePath(antFarm, path)
 		}
 		AssignAntsToPath(antFarm, paths, dist)
 		fmt.Println()
 	}
 }
 
+// * reset visited status of rooms in paths
 func resetVisited(paths []*Path) {
 	for _, path := range paths {
 		for _, room := range path.Rooms {
@@ -29,7 +30,6 @@ func resetVisited(paths []*Path) {
 		}
 	}
 }
-
 
 // * FindPaths uses BFS to find all paths from start to end in the ant farm.
 func BFS(antFarm *Antsfarm) []*Path {
@@ -106,7 +106,8 @@ func computeAntDistribution(paths []*Path, totalAnts int) *map[string]int {
 	// Find path with minimum (length + assigned ants)
 	for remaining > 0 {
 		// Find path with minimum (length + assigned ants)
-		minTurns := int(^uint(0) >> 1) // Max int
+
+		minTurns := int(^uint(0) >> 1) // Max int [minTurns = 9223372036854775807]
 		var bestPath *Path
 		for _, path := range paths {
 			turns := len(path.Rooms) + dist[path.String()]

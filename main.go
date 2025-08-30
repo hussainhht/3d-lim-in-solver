@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	lemin "lemin/handels"
+	lemin "lemin/handles"
 	"log"
 	"os"
 )
@@ -26,6 +26,7 @@ func main() {
 
 	//* write the input data to the output file
 	lemin.WriteFile(lemin.TakeData(FileName))
+	// lemin.TakeData(FileName)
 
 	lemin.RunAlgorithm(farm)
 

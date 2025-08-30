@@ -14,7 +14,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 	}
 	// Reduce to best non-overlapping paths
 	findBestPaths(antFarm, &paths)
-	
+
 	// * Sort paths by length (shortest → longest)
 	// the first input is the path being sorted, the second input is the function
 	// the function works like this [1 2] 3 checks the condition if it's true it swaps them
@@ -209,7 +209,7 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 
 //? FilterCheckCompare compares paths and only keeps the useful ones.
 
-func UpdatePath(antFarm *Antsfarm, path *Path, dist *map[string]int) {
+func UpdatePath(antFarm *Antsfarm, path *Path) {
 	for i := len(path.Ants) - 1; i >= 0; i-- {
 		ant := path.Ants[i]
 		finished := ant.Move(antFarm)
@@ -218,5 +218,4 @@ func UpdatePath(antFarm *Antsfarm, path *Path, dist *map[string]int) {
 			path.Ants = append(path.Ants[:i], path.Ants[i+1:]...)
 		}
 	}
-	_ = dist
 }
