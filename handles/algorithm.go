@@ -2,6 +2,7 @@ package lemin
 
 import (
 	"fmt"
+	"slices"
 )
 
 // todo run algo
@@ -75,12 +76,7 @@ func BFS(antFarm *Antsfarm) []*Path {
 
 // Helper: check if a room is already in the path (to avoid cycles)
 func roomInPath(path []*Room, room *Room) bool {
-	for _, r := range path {
-		if r == room {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(path, room)
 }
 
 func computeAntDistribution(paths []*Path, totalAnts int) *map[string]int {
