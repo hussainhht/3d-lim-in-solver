@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	// "os/exec"
 )
 
 // * Write a result to a file
@@ -46,6 +47,12 @@ func TypeResult() {
 
 // * Take data from a input file
 func TakeData(f_name string) string {
+	// str, err := exec.Command("cat", f_name).Output()
+	// if err != nil {
+	// 	log.Println("Error getting current directory:", err)
+	// 	return
+	// }
+	// fmt.Println(string(str))
 	file, err := os.Open(f_name)
 	if err != nil {
 		log.Println("Error reading from file:", err)

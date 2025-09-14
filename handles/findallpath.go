@@ -1,21 +1,20 @@
-// TODO: find  all path we can take from start to end
 package lemin
 
 import (
-	// "fmt"
-	//"fmt"
 	"log"
 	"sort"
 )
 
+// FindPaths returns a pruned, sorted slice of viable paths from start to end.
 func FindPaths(antFarm *Antsfarm) []*Path {
+	// Get all raw paths via BFS
 	paths := BFS(antFarm)
 	if len(paths) == 0 {
 		log.Fatal("No paths found from start to end")
 	}
-	//fmt.Println(paths)
+	// Reduce to best non-overlapping paths
 	findBestPaths(antFarm, &paths)
-	// findBestPaths(&paths)
+
 	// * Sort paths by length (shortest → longest)
 	// the first input is the path being sorted, the second input is the function
 	// the function works like this [1 2] 3 checks the condition if it's true it swaps them
@@ -24,7 +23,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 		return len(paths[i].Rooms) > len(paths[j].Rooms)
 	})
 
-	paths = FilterCheckCompare(paths, antFarm.TotalAnts)
+	// Remove paths that are not useful
 
 	return paths
 }
@@ -63,18 +62,14 @@ func findBestPaths(antFarm *Antsfarm, paths *[]*Path) {
 }
 
 // pathsOverlap checks if two paths share any rooms (except start and end)
-func pathsOverlap(path1, path2 *Path) bool {
+func pathsOverlap(a, b *Path) bool {
 	// Create a map for rooms in path1
 	rooms := make(map[string]bool)
-
-	// Add all rooms from path1 (except first and last) to the map
-	for i := 0; i < len(path1.Rooms)-1; i++ {
-		rooms[path1.Rooms[i].Name] = true
+	for i := 0; i < len(a.Rooms)-1; i++ {
+		rooms[a.Rooms[i].Name] = true
 	}
-
-	// Check if any room from path2 (except first and last) exists in path1
-	for i := 0; i < len(path2.Rooms)-1; i++ {
-		if rooms[path2.Rooms[i].Name] {
+	for i := 0; i < len(b.Rooms)-1; i++ {
+		if rooms[b.Rooms[i].Name] {
 			return true
 		}
 	}
@@ -170,6 +165,7 @@ func numberOfRounds(antFarm *Antsfarm, paths []*Path, bestSet map[int]bool, curr
 // findBestCombination uses backtracking to find the best combination of non-overlapping paths
 // It picks the set with the least number of rounds, not just the most paths
 func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[int]bool, n int) map[int]bool {
+
 	bestCombination := make(map[int]bool)
 	currentCombination := make(map[int]bool)
 
@@ -211,54 +207,15 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 	return bestCombination
 }
 
-// FilterCheckCompare compares paths and only keeps the useful ones.
-func FilterCheckCompare(paths []*Path, totalAnts int) []*Path {
-	if len(paths) == 0 {
-		return paths
-	}
+//? FilterCheckCompare compares paths and only keeps the useful ones.
 
-	shortest := len(paths[0].Rooms)
-	var worthwhile []*Path
-
-	for i, p := range paths {
-
-		if (len(p.Rooms) - shortest) <= (totalAnts / (i + 1)) {
-			worthwhile = append(worthwhile, p)
-		}
-	}
-
-	return worthwhile
-}
-
-func UpdatePath(antFarm *Antsfarm, path *Path, dist *map[string]int) {
+func UpdatePath(antFarm *Antsfarm, path *Path) {
 	for i := len(path.Ants) - 1; i >= 0; i-- {
 		ant := path.Ants[i]
 		finished := ant.Move(antFarm)
 		DisplayMovement(ant.ID, ant.Path.Rooms[ant.Position].Name)
 		if finished {
-			// safely remove
 			path.Ants = append(path.Ants[:i], path.Ants[i+1:]...)
 		}
-	}
-	if (*dist)[path.String()] > 0 {
-
-		//assign ants to path if there are still ants left
-
-		// if (*dist)[path] <= 0 {
-		// 	return
-		// }
-
-		// // Only assign ant in start room (Position = 0)
-		// newAnt := &Ant{
-		// 	ID:       antFarm.NextAnt + 1,
-		// 	Path:     path,
-		// 	Position: 0, // start room
-		// }
-		// path.Ants = append([]*Ant{newAnt}, path.Ants...)
-		// path.Rooms[0].Ant = newAnt // assign ant to start room
-
-		// antFarm.NextAnt++
-		// (*dist)[path]--
-		// DisplayMovement(newAnt.ID, antFarm.StartRoom.Name)
 	}
 }

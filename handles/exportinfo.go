@@ -1,27 +1,23 @@
 package lemin
 
-// * finish revision
-
 import (
 	"bufio"
 	"errors"
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
 
-var Endlink bool = false
-
 // readFile parses the lem-in input from text.txt in the current working directory
 // * and returns a populated Antsfarm structure.
-func ReadFile(f_name string) *Antsfarm {
+func Exportinfo(f_name string) *Antsfarm {
 	if !strings.HasSuffix(strings.TrimSpace(f_name), ".txt") {
 		fmt.Println("File name must end with .txt")
 		os.Exit(1)
 	}
-	
 	//? f_name := "input file name"
 	f, err := os.Open(f_name)
 	if err != nil {
@@ -49,7 +45,6 @@ func ReadFile(f_name string) *Antsfarm {
 			continue
 		}
 
-
 		// Check for valid ants line
 		if !parsedAnts {
 			if strings.HasPrefix(line, "#") { // comments before ants line
@@ -73,12 +68,12 @@ func ReadFile(f_name string) *Antsfarm {
 
 		// Commands or comments
 		if strings.HasPrefix(line, "##") {
-			
+
 			if linkSection && (line == "##start" || line == "##end") { // commands not allowed after link section begins
 				fmt.Println("Command after links started:", line)
 				return nil
 			}
-			
+
 			// Check for valid start/end commands
 			switch line {
 			case "##start":
@@ -112,6 +107,7 @@ func ReadFile(f_name string) *Antsfarm {
 
 			// Reset start/end expectations
 			name1, name2 := parseLinkLine(line)
+			// check that both room names exist in your room map before proceeding
 			r1, ok1 := farm.Rooms[name1]
 			r2, ok2 := farm.Rooms[name2]
 			if !ok1 || !ok2 {
@@ -153,6 +149,7 @@ func ReadFile(f_name string) *Antsfarm {
 			log.Println("Invalid room name:", line)
 			return nil
 		}
+		//exists is a boolean that is true if the key exists, otherwise false.
 		if _, exists := farm.Rooms[name]; exists {
 			log.Println("Duplicate room name:", line)
 			return nil
@@ -163,12 +160,16 @@ func ReadFile(f_name string) *Antsfarm {
 			fmt.Println("Invalid room coordinates:", line)
 			return nil
 		}
+		// key is "x:y"
+		// value is room name
 		coordKey := fmt.Sprintf("%d:%d", x, y)
 		if other := coordSet[coordKey]; other != "" {
 			log.Println("Duplicate room coordinates:", line)
 			return nil
 		}
+		// This creates a new Room struct instance and takes its pointer.
 		r := &Room{Name: name, X: x, Y: y}
+		// This line adds the new room r to that map using the room’s name as the key.
 		farm.Rooms[name] = r
 		coordSet[coordKey] = name
 		if expectStart {
@@ -200,17 +201,10 @@ func ReadFile(f_name string) *Antsfarm {
 		fmt.Println("File ended before room after start/end command")
 		return nil
 	}
-
-	if len(farm.StartRoom.Links) == 0 {
-		log.Fatal("Missing links from start room")
-	}
-
-	if len(farm.EndRoom.Links) == 0 {
-		log.Fatal("Missing links from end room")
-	}
-
 	return farm
 }
+
+// --------------------- Helpers ----------------------------------------------------------------------
 
 // *String returns a concise summary of the parsed farm.
 func (f *Antsfarm) String() string {
@@ -271,18 +265,19 @@ func parseLinkLine(line string) (string, string) {
 
 // * addLink adds an undirected edge between two rooms, enforcing constraints.
 func addLink(a, b *Room) error {
-	if a == nil || b == nil {
+	if a == nil || b == nil { // prevents linking to a room that does not exist (nil pointer)
 		return errors.New("nil room in link")
 	}
-	if a == b {
+
+	if a == b { // self loop could cause infinite loops or incorrect graph logic.
 		return errors.New("self-loop is forbidden")
 	}
+
 	// check duplicates in a's adjacency
-	for _, l := range a.Links {
-		if l == b {
-			return errors.New("duplicate link")
-		}
+	if slices.Contains(a.Links, b) {
+		return errors.New("duplicate link")
 	}
+
 	a.Links = append(a.Links, b)
 	b.Links = append(b.Links, a)
 	return nil

@@ -1,0 +1,62 @@
+.
+├── 3D
+│   ├── input.txt
+│   └── main.go
+├── Notes
+│   ├── Batool
+│   │   ├── Intro.md
+│   │   ├── bat.txt
+│   │   ├── dereference.md
+│   │   ├── mapoint.md
+│   │   └── referencetype.md
+│   ├── comints.sh
+│   └── hussain
+│       ├── DFS.md
+│       ├── numberOfRounds.md
+│       └── what-is-scanner-in-go.md
+├── copy.txt
+├── dist.txt
+├── errt.txt
+├── go.mod
+├── go.sum
+├── handels
+│   ├── algorithm.go
+│   ├── exportinfo.go
+│   ├── file.go
+│   ├── findallpath.go
+│   ├── findbistbath.go
+│   ├── models.go
+│   ├── moveant.go
+│   ├── newstuff.go
+│   └── printant.go
+├── input.txt
+├── main.go
+├── paths.txt
+├── raylib.dll
+├── result
+│   ├── badresult00.txt
+│   ├── badresult01.txt
+│   ├── result00.txt
+│   ├── result01.txt
+│   ├── result02.txt
+│   ├── result03.txt
+│   ├── result04.txt
+│   ├── result05.txt
+│   ├── result06.txt
+│   └── result07.txt
+├── result.txt
+├── run_tests.sh
+├── test
+│   ├── badexample00.txt
+│   ├── badexample01
+│   ├── example00.txt
+│   ├── example01.txt
+│   ├── example02.txt
+│   ├── example03.txt
+│   ├── example04.txt
+│   ├── example05.txt
+│   ├── example06.txt
+│   └── example07.txt
+└── tree.txt
+
+8 directories, 52 files
