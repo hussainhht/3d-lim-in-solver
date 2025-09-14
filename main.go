@@ -7,7 +7,6 @@ import (
 	"os"
 )
 
-
 func main() {
 	// * take input file name from command line arguments
 	args := os.Args[1:]
@@ -18,7 +17,7 @@ func main() {
 
 	// * Read the input file and parse the data
 	FileName := args[0]
-	farm := lemin.ReadFile(FileName)
+	farm := lemin.Exportinfo(FileName)
 	if farm == nil {
 		log.Println("Error reading file")
 		return

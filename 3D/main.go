@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -10,7 +9,7 @@ import (
 	"time"
 
 	rl "github.com/gen2brain/raylib-go/raylib"
-) 
+)
 
 type v3 = rl.Vector3
 
@@ -26,7 +25,7 @@ func main() {
 	scale := flag.Float64("scale", 1.6, "layout scale (spread rooms)")
 	flag.Parse()
 
-	farm := lemin.ReadFile(*input)
+	farm := lemin.Exportinfo(*input)
 	if farm == nil {
 		log.Fatal("failed to parse input file")
 	}
@@ -72,7 +71,7 @@ func main() {
 		Projection: rl.CameraPerspective,
 	}
 
-		//! Ants
+	//! Ants
 	ants := farm.TotalAnts
 	phase := make([]float32, ants)
 	for i := 0; i < ants; i++ {

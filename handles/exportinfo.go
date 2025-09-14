@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
-	"slices"
 )
 
 // readFile parses the lem-in input from text.txt in the current working directory
 // * and returns a populated Antsfarm structure.
-func ReadFile(f_name string) *Antsfarm {
+func Exportinfo(f_name string) *Antsfarm {
 	if !strings.HasSuffix(strings.TrimSpace(f_name), ".txt") {
 		fmt.Println("File name must end with .txt")
 		os.Exit(1)
@@ -204,10 +204,7 @@ func ReadFile(f_name string) *Antsfarm {
 	return farm
 }
 
-
-
 // --------------------- Helpers ----------------------------------------------------------------------
-
 
 // *String returns a concise summary of the parsed farm.
 func (f *Antsfarm) String() string {
@@ -269,7 +266,7 @@ func parseLinkLine(line string) (string, string) {
 // * addLink adds an undirected edge between two rooms, enforcing constraints.
 func addLink(a, b *Room) error {
 	if a == nil || b == nil { // prevents linking to a room that does not exist (nil pointer)
-		return errors.New("nil room in link") 
+		return errors.New("nil room in link")
 	}
 
 	if a == b { // self loop could cause infinite loops or incorrect graph logic.

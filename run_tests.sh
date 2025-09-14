@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 export PATH=$PATH:/usr/local/go/bin  # adjust if needed
 
 for i in {00..05}; do
