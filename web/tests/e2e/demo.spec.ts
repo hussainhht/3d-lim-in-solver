@@ -105,10 +105,6 @@ test("production load, real WASM, exact turns, playback, camera and completion",
     "aria-pressed",
     "true",
   );
-  await page.getByText("How Lem-in Works", { exact: true }).click();
-  await expect(
-    page.getByText("Exhaustive search. Measured correctness."),
-  ).toBeVisible();
   expect(failures).toEqual([]);
 });
 

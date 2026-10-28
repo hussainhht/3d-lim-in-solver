@@ -35,7 +35,6 @@ import {
   ShieldCheck,
   SkipBack,
   SkipForward,
-  Sparkles,
   Terminal,
   Timer,
   Trash2,
@@ -302,7 +301,6 @@ export default function App() {
           <a href="#playground" className="nav-active">
             Playground
           </a>
-          <a href="#how-it-works">How it works</a>
           <a
             href="https://github.com/hussainhht/3d-lim-in-solver"
             target="_blank"
@@ -316,32 +314,10 @@ export default function App() {
         </span>
       </header>
       <main>
-        <section className="intro">
-          <div>
-            <div className="eyebrow">
-              <span /> GRAPH THEORY, BROUGHT TO LIFE
-            </div>
-            <h1>
-              A small colony.
-              <br className="mobile-break" /> <span>A remarkable journey.</span>
-            </h1>
-            <p>
-              One colony. Many possible routes. Find a way forward, one turn at
-              a time.
-            </p>
-          </div>
-          <div className="engine-note">
-            <Cpu size={22} />
-            <div>
-              Real Go solver<span>WebAssembly · entirely in your browser</span>
-            </div>
-          </div>
-        </section>
         <div className="workspace-heading" id="playground">
           <div>
             <span className="section-index">01</span>
             <h2>Colony playground</h2>
-            <span className="version-tag">3D ANT COLONY SOLVER</span>
           </div>
           <span className="privacy-note">
             <ShieldCheck size={13} /> Your maps stay on your device
@@ -879,15 +855,6 @@ export default function App() {
                 )}
               </div>
             </div>
-            <div className="verified-note">
-              <ShieldCheck size={15} />
-              <span>
-                {solution
-                  ? "Every movement verified"
-                  : "Built for honest results"}
-                <small>Existing Go solver. Real output.</small>
-              </span>
-            </div>
           </aside>
         </div>
         <section className="panel output-panel" aria-label="Output inspector">
@@ -1017,83 +984,6 @@ export default function App() {
             </div>
           )}
         </section>
-        <details className="education panel" id="how-it-works">
-          <summary>
-            <div>
-              <span className="section-index">02</span>
-              <span>
-                <strong>How Lem-in Works</strong>
-                <small>From a text map to a coordinated colony.</small>
-              </span>
-            </div>
-            <span className="education-open">
-              Explore the algorithm <ChevronDown size={17} />
-            </span>
-          </summary>
-          <div className="education-body">
-            <div className="pipeline">
-              {[
-                {
-                  icon: Code2,
-                  title: "Parse",
-                  text: "Read ants, integer room coordinates, commands and tunnels.",
-                },
-                {
-                  icon: ShieldCheck,
-                  title: "Validate",
-                  text: "Check map constraints and whether the destination is reachable.",
-                },
-                {
-                  icon: Network,
-                  title: "Enumerate",
-                  text: "BFS extends partial paths to enumerate every simple route.",
-                },
-                {
-                  icon: Route,
-                  title: "Select",
-                  text: "Backtrack over compatible room-disjoint path combinations.",
-                },
-                {
-                  icon: GitBranch,
-                  title: "Distribute",
-                  text: "Assign ants to the smallest path length + assigned count.",
-                },
-                {
-                  icon: Play,
-                  title: "Simulate",
-                  text: "Advance existing ants first, then release new ants per path.",
-                },
-                {
-                  icon: CheckCircle2,
-                  title: "Display",
-                  text: "Verify legal movements. Replay the recorded turns in 3D.",
-                },
-              ].map((step, i) => (
-                <div className="pipeline-card" key={step.title}>
-                  <span>
-                    {String(i + 1).padStart(2, "0")}
-                    <step.icon size={17} />
-                  </span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="algorithm-note">
-              <Sparkles size={19} />
-              <p>
-                <strong>Exhaustive search. Measured correctness.</strong> This
-                is the original breadth-first path enumeration and backtracking
-                solver, compiled from Go. It compares compatible sets using its
-                own turn estimate; it is not a max-flow algorithm. Repository
-                tests check legal movements and reference turn counts. Global
-                optimality is not mathematically proven. Dense maps can take
-                exponential time; browser budgets stop the search instead of
-                inventing a result.
-              </p>
-            </div>
-          </div>
-        </details>
       </main>
       <footer>
         <div className="footer-brand">
