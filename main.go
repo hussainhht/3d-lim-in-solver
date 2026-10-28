@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	lemin "lemin/handles"
-	"log"
 	"os"
 )
 
@@ -19,8 +18,8 @@ func main() {
 	FileName := args[0]
 	farm := lemin.Exportinfo(FileName)
 	if farm == nil {
-		log.Println("Error reading file")
-		return
+		fmt.Println("ERROR: invalid data format")
+		os.Exit(1)
 	}
 
 	//* write the input data to the output file

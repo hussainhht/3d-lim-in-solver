@@ -1,6 +1,9 @@
 package lemin
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // Antsfarm represents the parsed lem-in input.
 type Antsfarm struct {
@@ -10,6 +13,33 @@ type Antsfarm struct {
 	Rooms     map[string]*Room
 	StartRoom *Room
 	EndRoom   *Room
+
+	turn []Movement // movements recorded during the turn being simulated
+}
+
+// Movement records one ant stepping into a room during a turn ("L<AntID>-<Room>").
+type Movement struct {
+	AntID int
+	Room  string
+}
+
+// Result is the full outcome of a simulation: the paths that were used and the
+// movements of every turn, in order. The CLI prints it; the 3D visualizer replays it.
+type Result struct {
+	Paths []*Path
+	Turns [][]Movement
+}
+
+// record stores a movement for the turn currently being simulated.
+func (f *Antsfarm) record(antID int, room string) {
+	f.turn = append(f.turn, Movement{AntID: antID, Room: room})
+}
+
+// flushTurn returns the movements recorded since the last call and starts a new turn.
+func (f *Antsfarm) flushTurn() []Movement {
+	t := f.turn
+	f.turn = nil
+	return t
 }
 
 // Room represents a single room node.
@@ -42,7 +72,7 @@ func (ant *Ant) Move(antFarm *Antsfarm) bool {
 
     // Only block if next room is occupied AND it is not the end room
     if nextRoom != antFarm.EndRoom && nextRoom.Ant != nil {
-        fmt.Print("L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
+        fmt.Fprint(os.Stderr, "L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
         return false
     }
 

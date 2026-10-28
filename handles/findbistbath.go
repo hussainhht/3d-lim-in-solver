@@ -57,7 +57,7 @@ func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist *map[string]int) {
 			antFarm.NextAnt++
 			(*dist)[path.String()]--
 			antFarm.DoneAnts++
-			DisplayMovement(newAnt.ID, antFarm.EndRoom.Name)
+			antFarm.record(newAnt.ID, antFarm.EndRoom.Name)
 			continue
 		}
 		// Only assign ant in start room (Position = 0)
@@ -69,7 +69,7 @@ func AssignAntsToPath(antFarm *Antsfarm, paths []*Path, dist *map[string]int) {
 		path.Ants = append([]*Ant{newAnt}, path.Ants...)
 		antFarm.NextAnt++
 		(*dist)[path.String()]--
-		DisplayMovement(newAnt.ID, path.Rooms[0].Name)
+		antFarm.record(newAnt.ID, path.Rooms[0].Name)
 
 		if antFarm.NextAnt >= antFarm.TotalAnts {
 			break

@@ -7,20 +7,34 @@ import (
 
 // todo run algo
 
+// RunAlgorithm simulates the colony and prints one line per turn to stdout.
 func RunAlgorithm(antFarm *Antsfarm) {
+	for _, turn := range Simulate(antFarm).Turns {
+		for _, m := range turn {
+			DisplayMovement(m.AntID, m.Room)
+		}
+		fmt.Println()
+	}
+}
+
+// Simulate finds the paths, distributes the ants and plays the colony turn by
+// turn until every ant has reached the end room. It prints nothing.
+func Simulate(antFarm *Antsfarm) *Result {
 
 	paths := FindPaths(antFarm)
 
 	dist := computeAntDistribution(paths, antFarm.TotalAnts)
 
+	result := &Result{Paths: paths}
 	for antFarm.DoneAnts < antFarm.TotalAnts {
 		resetVisited(paths)
 		for _, path := range paths { // move ants in paths forward
 			UpdatePath(antFarm, path)
 		}
 		AssignAntsToPath(antFarm, paths, dist)
-		fmt.Println()
+		result.Turns = append(result.Turns, antFarm.flushTurn())
 	}
+	return result
 }
 
 // * reset visited status of rooms in paths

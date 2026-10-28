@@ -15,13 +15,13 @@ import (
 // * and returns a populated Antsfarm structure.
 func Exportinfo(f_name string) *Antsfarm {
 	if !strings.HasSuffix(strings.TrimSpace(f_name), ".txt") {
-		fmt.Println("File name must end with .txt")
+		fmt.Fprintln(os.Stderr, "File name must end with .txt")
 		os.Exit(1)
 	}
 	//? f_name := "input file name"
 	f, err := os.Open(f_name)
 	if err != nil {
-		fmt.Println("Error opening file:", err)
+		fmt.Fprintln(os.Stderr, "Error opening file:", err)
 		return nil
 	}
 	defer f.Close()
@@ -52,7 +52,7 @@ func Exportinfo(f_name string) *Antsfarm {
 			}
 			ants, err := strconv.Atoi(line)
 			if err != nil || ants <= 0 {
-				fmt.Println("Invalid ants:", line)
+				fmt.Fprintln(os.Stderr, "Invalid ants:", line)
 				return nil
 			}
 
@@ -70,7 +70,7 @@ func Exportinfo(f_name string) *Antsfarm {
 		if strings.HasPrefix(line, "##") {
 
 			if linkSection && (line == "##start" || line == "##end") { // commands not allowed after link section begins
-				fmt.Println("Command after links started:", line)
+				fmt.Fprintln(os.Stderr, "Command after links started:", line)
 				return nil
 			}
 
@@ -78,14 +78,14 @@ func Exportinfo(f_name string) *Antsfarm {
 			switch line {
 			case "##start":
 				if farm.StartRoom != nil {
-					fmt.Println("Duplicate start command:", line)
+					fmt.Fprintln(os.Stderr, "Duplicate start command:", line)
 					return nil
 				}
 				expectStart = true
 				expectEnd = false
 			case "##end":
 				if farm.EndRoom != nil {
-					fmt.Println("Duplicate end command:", line)
+					fmt.Fprintln(os.Stderr, "Duplicate end command:", line)
 					return nil
 				}
 				expectEnd = true
@@ -111,19 +111,19 @@ func Exportinfo(f_name string) *Antsfarm {
 			r1, ok1 := farm.Rooms[name1]
 			r2, ok2 := farm.Rooms[name2]
 			if !ok1 || !ok2 {
-				fmt.Println("Link references unknown room:", line)
+				fmt.Fprintln(os.Stderr, "Link references unknown room:", line)
 				return nil
 			}
 
 			// * Add link, checking for self-loops and duplicates
 			if err := addLink(r1, r2); err != nil {
-				fmt.Println("Error adding link:", err)
+				fmt.Fprintln(os.Stderr, "Error adding link:", err)
 				return nil
 			}
 
 			// After consuming a link, pending start/end expectation is invalid
 			if expectStart || expectEnd {
-				fmt.Println("Expected room after command, found link:", line)
+				fmt.Fprintln(os.Stderr, "Expected room after command, found link:", line)
 				return nil
 			}
 			continue
@@ -131,7 +131,7 @@ func Exportinfo(f_name string) *Antsfarm {
 
 		// * If link section already started, no more room definitions allowed
 		if linkSection {
-			fmt.Println("Room definition after links started:", line)
+			fmt.Fprintln(os.Stderr, "Room definition after links started:", line)
 			return nil
 		}
 
@@ -157,7 +157,7 @@ func Exportinfo(f_name string) *Antsfarm {
 		x, errX := strconv.Atoi(parts[1])
 		y, errY := strconv.Atoi(parts[2])
 		if errX != nil || errY != nil {
-			fmt.Println("Invalid room coordinates:", line)
+			fmt.Fprintln(os.Stderr, "Invalid room coordinates:", line)
 			return nil
 		}
 		// key is "x:y"
@@ -181,24 +181,24 @@ func Exportinfo(f_name string) *Antsfarm {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Scan error:", err)
+		fmt.Fprintln(os.Stderr, "Scan error:", err)
 		return nil
 	}
 
 	if !parsedAnts {
-		fmt.Println("Missing ants line")
+		fmt.Fprintln(os.Stderr, "Missing ants line")
 		return nil
 	}
 	if farm.StartRoom == nil {
-		fmt.Println("Missing start room")
+		fmt.Fprintln(os.Stderr, "Missing start room")
 		return nil
 	}
 	if farm.EndRoom == nil {
-		fmt.Println("Missing end room")
+		fmt.Fprintln(os.Stderr, "Missing end room")
 		return nil
 	}
 	if expectStart || expectEnd {
-		fmt.Println("File ended before room after start/end command")
+		fmt.Fprintln(os.Stderr, "File ended before room after start/end command")
 		return nil
 	}
 	return farm

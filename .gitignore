@@ -1,0 +1,5 @@
+# Build outputs
+*.exe
+
+# Local scratch files
+*.orig

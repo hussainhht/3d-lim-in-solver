@@ -1,6 +1,7 @@
 package lemin
 
 import (
+	"fmt"
 	"log"
 	"sort"
 )
@@ -10,6 +11,7 @@ func FindPaths(antFarm *Antsfarm) []*Path {
 	// Get all raw paths via BFS
 	paths := BFS(antFarm)
 	if len(paths) == 0 {
+		fmt.Println("ERROR: invalid data format")
 		log.Fatal("No paths found from start to end")
 	}
 	// Reduce to best non-overlapping paths
@@ -213,7 +215,7 @@ func UpdatePath(antFarm *Antsfarm, path *Path) {
 	for i := len(path.Ants) - 1; i >= 0; i-- {
 		ant := path.Ants[i]
 		finished := ant.Move(antFarm)
-		DisplayMovement(ant.ID, ant.Path.Rooms[ant.Position].Name)
+		antFarm.record(ant.ID, ant.Path.Rooms[ant.Position].Name)
 		if finished {
 			path.Ants = append(path.Ants[:i], path.Ants[i+1:]...)
 		}
