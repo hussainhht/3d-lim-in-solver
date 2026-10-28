@@ -16,6 +16,27 @@ A Go solver for the classic *lem-in* problem, plus a 3D visualizer that replays 
 
 ---
 
+## Live Interactive Demo
+
+**[Open Lem-in | 3D Ant Colony Solver →](https://hussainhht.github.io/3d-lim-in-solver/)**
+
+![Live browser demo replaying the real Go solver at turn 4.5](docs/images/live-demo-desktop.png)
+
+[Mobile preview](docs/images/live-demo-mobile.png) · Real browser captures, not design mockups.
+
+Explore the real Go solver in a browser: edit or upload colony maps, solve with WebAssembly in an isolated Web Worker, and replay verified ant movements in an interactive Three.js observatory. Includes orbit/pan/zoom, route highlighting, room and ant inspection, precise playback and scrubbing, live statistics, exact solver output, responsive controls, and a graphics fallback.
+
+The CLI and original Raylib application are preserved. The web demo lives in `web/`, shares `handles/`, and deploys from **`livedemo`** through GitHub Actions. Visitors install nothing and maps stay on their device.
+
+```bash
+cd web
+npm ci
+npm run wasm
+npm run dev
+```
+
+For production use `npm run build`; for a local production preview use `npm run preview` and open `/3d-lim-in-solver/`. Development requires Go 1.24.2+ and Node 22.19+. [Architecture, testing, deployment, browser support and limitations](docs/LIVE_DEMO.md).
+
 ## Table of Contents
 
 1. [Project Preview](#project-preview)

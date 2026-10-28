@@ -61,6 +61,9 @@ func BFS(antFarm *Antsfarm) []*Path {
 	}
 
 	for len(queue) > 0 {
+		if antFarm.budget != nil {
+			antFarm.budget.enumeration(len(queue), len(results))
+		}
 		// Dequeue first path
 		path := queue[0]
 		queue = queue[1:]
@@ -85,6 +88,9 @@ func BFS(antFarm *Antsfarm) []*Path {
 		}
 	}
 
+	if antFarm.budget != nil {
+		antFarm.budget.enumeration(0, len(results))
+	}
 	return results
 }
 

@@ -3,3 +3,13 @@
 
 # Local scratch files
 *.orig
+
+# Browser build artifacts and local verification
+.local/
+web/node_modules/
+web/dist/
+web/public/solver.wasm
+web/public/wasm_exec.js
+web/*.tsbuildinfo
+web/test-results/
+web/playwright-report/

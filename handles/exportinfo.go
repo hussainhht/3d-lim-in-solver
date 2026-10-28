@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
+	"io"
 	"os"
 	"slices"
 	"strconv"
@@ -26,11 +26,25 @@ func Exportinfo(f_name string) *Antsfarm {
 	}
 	defer f.Close()
 
+	farm, err := ParseMap(f)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return nil
+	}
+	return farm
+}
+
+// ParseMap is the shared, in-memory parser used by the CLI and WebAssembly.
+// It has the original parsing rules and returns diagnostics without exiting.
+func ParseMap(reader io.Reader) (*Antsfarm, error) {
 	farm := &Antsfarm{Rooms: make(map[string]*Room)}
 	coordSet := make(map[string]string) // key: "x:y" -> room name
 
-	scanner := bufio.NewScanner(f)
+	scanner := bufio.NewScanner(reader)
 	lineNo := 0
+	fail := func(parts ...any) (*Antsfarm, error) {
+		return nil, fmt.Errorf("line %d: %s", lineNo, strings.TrimSpace(fmt.Sprintln(parts...)))
+	}
 	parsedAnts := false
 	linkSection := false
 	expectStart := false
@@ -52,13 +66,12 @@ func Exportinfo(f_name string) *Antsfarm {
 			}
 			ants, err := strconv.Atoi(line)
 			if err != nil || ants <= 0 {
-				fmt.Fprintln(os.Stderr, "Invalid ants:", line)
-				return nil
+				return fail("Invalid ants:", line)
 			}
 
 			// Check for too many ants
 			if ants > 1000000 {
-				log.Fatal("Too many ants (>1000000)")
+				return fail("Too many ants (>1000000)")
 			}
 
 			farm.TotalAnts = ants
@@ -70,23 +83,20 @@ func Exportinfo(f_name string) *Antsfarm {
 		if strings.HasPrefix(line, "##") {
 
 			if linkSection && (line == "##start" || line == "##end") { // commands not allowed after link section begins
-				fmt.Fprintln(os.Stderr, "Command after links started:", line)
-				return nil
+				return fail("Command after links started:", line)
 			}
 
 			// Check for valid start/end commands
 			switch line {
 			case "##start":
 				if farm.StartRoom != nil {
-					fmt.Fprintln(os.Stderr, "Duplicate start command:", line)
-					return nil
+					return fail("Duplicate start command:", line)
 				}
 				expectStart = true
 				expectEnd = false
 			case "##end":
 				if farm.EndRoom != nil {
-					fmt.Fprintln(os.Stderr, "Duplicate end command:", line)
-					return nil
+					return fail("Duplicate end command:", line)
 				}
 				expectEnd = true
 				expectStart = false
@@ -111,61 +121,52 @@ func Exportinfo(f_name string) *Antsfarm {
 			r1, ok1 := farm.Rooms[name1]
 			r2, ok2 := farm.Rooms[name2]
 			if !ok1 || !ok2 {
-				fmt.Fprintln(os.Stderr, "Link references unknown room:", line)
-				return nil
+				return fail("Link references unknown room:", line)
 			}
 
 			// * Add link, checking for self-loops and duplicates
 			if err := addLink(r1, r2); err != nil {
-				fmt.Fprintln(os.Stderr, "Error adding link:", err)
-				return nil
+				return fail("Error adding link:", err)
 			}
 
 			// After consuming a link, pending start/end expectation is invalid
 			if expectStart || expectEnd {
-				fmt.Fprintln(os.Stderr, "Expected room after command, found link:", line)
-				return nil
+				return fail("Expected room after command, found link:", line)
 			}
 			continue
 		}
 
 		// * If link section already started, no more room definitions allowed
 		if linkSection {
-			fmt.Fprintln(os.Stderr, "Room definition after links started:", line)
-			return nil
+			return fail("Room definition after links started:", line)
 		}
 
 		// Room line
 		// Format: name x y
 		parts := strings.Fields(line)
 		if len(parts) != 3 {
-			log.Println("Invalid room format:", line)
-			return nil
+			return fail("Invalid room format:", line)
 		}
 
 		// Validate room name
 		name := parts[0]
 		if err := validateRoomName(name); err != nil {
-			log.Println("Invalid room name:", line)
-			return nil
+			return fail("Invalid room name:", line)
 		}
 		//exists is a boolean that is true if the key exists, otherwise false.
 		if _, exists := farm.Rooms[name]; exists {
-			log.Println("Duplicate room name:", line)
-			return nil
+			return fail("Duplicate room name:", line)
 		}
 		x, errX := strconv.Atoi(parts[1])
 		y, errY := strconv.Atoi(parts[2])
 		if errX != nil || errY != nil {
-			fmt.Fprintln(os.Stderr, "Invalid room coordinates:", line)
-			return nil
+			return fail("Invalid room coordinates:", line)
 		}
 		// key is "x:y"
 		// value is room name
 		coordKey := fmt.Sprintf("%d:%d", x, y)
 		if other := coordSet[coordKey]; other != "" {
-			log.Println("Duplicate room coordinates:", line)
-			return nil
+			return fail("Duplicate room coordinates:", line)
 		}
 		// This creates a new Room struct instance and takes its pointer.
 		r := &Room{Name: name, X: x, Y: y}
@@ -181,27 +182,22 @@ func Exportinfo(f_name string) *Antsfarm {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "Scan error:", err)
-		return nil
+		return fail("Scan error:", err)
 	}
 
 	if !parsedAnts {
-		fmt.Fprintln(os.Stderr, "Missing ants line")
-		return nil
+		return fail("Missing ants line")
 	}
 	if farm.StartRoom == nil {
-		fmt.Fprintln(os.Stderr, "Missing start room")
-		return nil
+		return fail("Missing start room")
 	}
 	if farm.EndRoom == nil {
-		fmt.Fprintln(os.Stderr, "Missing end room")
-		return nil
+		return fail("Missing end room")
 	}
 	if expectStart || expectEnd {
-		fmt.Fprintln(os.Stderr, "File ended before room after start/end command")
-		return nil
+		return fail("File ended before room after start/end command")
 	}
-	return farm
+	return farm, nil
 }
 
 // --------------------- Helpers ----------------------------------------------------------------------

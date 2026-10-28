@@ -14,7 +14,8 @@ type Antsfarm struct {
 	StartRoom *Room
 	EndRoom   *Room
 
-	turn []Movement // movements recorded during the turn being simulated
+	turn   []Movement    // movements recorded during the turn being simulated
+	budget *searchBudget // optional browser-only resource guard; nil for native callers
 }
 
 // Movement records one ant stepping into a room during a turn ("L<AntID>-<Room>").
@@ -62,37 +63,36 @@ type Ant struct {
 }
 
 func (ant *Ant) Move(antFarm *Antsfarm) bool {
-    nextPosition := ant.Position + 1
-    if nextPosition >= len(ant.Path.Rooms) {
-        return true
-    }
+	nextPosition := ant.Position + 1
+	if nextPosition >= len(ant.Path.Rooms) {
+		return true
+	}
 
-    currentRoom := ant.Path.Rooms[ant.Position]
-    nextRoom := ant.Path.Rooms[nextPosition]
+	currentRoom := ant.Path.Rooms[ant.Position]
+	nextRoom := ant.Path.Rooms[nextPosition]
 
-    // Only block if next room is occupied AND it is not the end room
-    if nextRoom != antFarm.EndRoom && nextRoom.Ant != nil {
-        fmt.Fprint(os.Stderr, "L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
-        return false
-    }
+	// Only block if next room is occupied AND it is not the end room
+	if nextRoom != antFarm.EndRoom && nextRoom.Ant != nil {
+		fmt.Fprint(os.Stderr, "L", ant.ID, " waiting in room ", currentRoom.Name, " for room ", nextRoom.Name, " ")
+		return false
+	}
 
-    // Move ant
-    currentRoom.Ant = nil
-    ant.Position++
-    if nextRoom != antFarm.EndRoom {
-        nextRoom.Ant = ant
-    } else {
-        // Arrived at end
-        antFarm.DoneAnts++
-    }
+	// Move ant
+	currentRoom.Ant = nil
+	ant.Position++
+	if nextRoom != antFarm.EndRoom {
+		nextRoom.Ant = ant
+	} else {
+		// Arrived at end
+		antFarm.DoneAnts++
+	}
 
-    return nextRoom == antFarm.EndRoom
+	return nextRoom == antFarm.EndRoom
 }
 
-
 type Path struct {
-	Rooms []*Room
-	Ants  []*Ant
+	Rooms     []*Room
+	Ants      []*Ant
 	Antscount int
 }
 

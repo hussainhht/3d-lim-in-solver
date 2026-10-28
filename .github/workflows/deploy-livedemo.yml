@@ -1,0 +1,93 @@
+name: Deploy livedemo to GitHub Pages
+
+on:
+  push:
+    branches: [livedemo]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: livedemo-pages
+  cancel-in-progress: true
+
+jobs:
+  native-regression:
+    if: github.ref == 'refs/heads/livedemo'
+    runs-on: windows-latest
+    env:
+      CGO_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Preserve the CLI and native Raylib application
+        run: |
+          go build ./...
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          go vet ./...
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          go test ./...
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+  build:
+    if: github.ref == 'refs/heads/livedemo'
+    needs: native-regression
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    env:
+      CGO_ENABLED: "0"
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: Compile Go WASM and build production assets
+        run: npm run build
+      - name: Compare WASM with native Go and exact CLI output
+        run: npm test
+      - name: Install test browsers
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Test production at the GitHub Pages subpath
+        run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-verification
+          path: web/test-results/
+          retention-days: 7
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy static production build
+        id: deployment
+        uses: actions/deploy-pages@v4

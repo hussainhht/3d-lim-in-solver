@@ -173,6 +173,9 @@ func findBestCombination(antFarm *Antsfarm, paths []*Path, overlaps map[int]map[
 
 	var tryPath func(pathIndex int)
 	tryPath = func(pathIndex int) {
+		if antFarm.budget != nil {
+			antFarm.budget.selection()
+		}
 		if pathIndex == n {
 			// Compare with best using numberOfRounds
 			cmp := numberOfRounds(antFarm, paths, bestCombination, currentCombination)
